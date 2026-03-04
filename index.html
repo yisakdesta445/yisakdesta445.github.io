@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Information Portal</title>
+    <style>
+        /* CSS Section - Styling the webpage */
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+
+        nav {
+            background-color: #34495e;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+        }
+
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            overflow: hidden;
+        }
+
+        .main-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #27ae60;
+            padding-bottom: 10px;
+        }
+
+        .uniform-section {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .uniform-image {
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .uniform-image img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            border: 3px solid #ddd;
+        }
+
+        .uniform-details {
+            flex: 2;
+        }
+
+        .uniform-details ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .uniform-details li {
+            background-color: #e8f8f5;
+            margin: 10px 0;
+            padding: 15px;
+            border-left: 5px solid #27ae60;
+            border-radius: 4px;
+        }
+
+        .uniform-details li strong {
+            color: #2c3e50;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #2c3e50;
+            color: white;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+nav a {
+    text-decoration: none;
+    padding: 10px 15px;
+    color: white;
+    font-weight: bold;
+}
+
+nav a.active {
+    background-color: #27ae60; /* የአሁኑ ገጽ መሆኑን ለማሳየት አረንጓዴ ቀለም */
+    border-radius: 5px;
+}
+
+nav a:hover {
+    background-color: #34495e; /* ማውሱ ሲያርፍበት የሚቀየር ቀለም */
+    border-radius: 5px;
+}
+#timetable-container {
+    animation: fadeIn 0.5s; /* ብቅ ሲል ቀስ ብሎ እንዲመጣ */
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+}
+
+@keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+
+table, th, td {
+    border: 2px solid black !important; /* መስመሮቹ እንዲታዩ */
+}
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1> እንኳን ወደ ርሆቦት ትምህርት ቤት ድህረ ገጽ በዳና መጡ</h1>
+    </header>
+<nav>
+    <a href="index.html" class="active">ዋና ገፅ</a> 
+    </nav>
+<nav class="main-nav">
+    <a href="#" onclick="showTimetable()">ክፍለ ጊዜዎች</a>
+</nav>
+
+<div id="timetable-container" style="display: none; margin-top: 20px;">
+    <h2 style="text-align:center;">የ 8ኛ ክፍለ ጊዜ ሰንጠረዥ</h2>
+    <table border="1" style="width:100%; border-collapse: collapse; text-align: center;">
+        <thead style="background-color: #ADD8E6;">
+            <tr>
+                <th>ቀናት</th>
+                <th>2:30 - 3:00</th>
+                <th>3:30 - 4:00</th>                
+                <th>4:30 - 5:00</th>
+                <th>እረፍት</th>             
+                <th>5:00 - 5:30</th>            
+           
+        </thead>
+        <tbody>
+            <tr>
+                <td>ሰኞ</td>
+                <td>ሒሳብ</td>
+                <td>አማርኛ</td>
+                
+ <td>ሶሻል</td>
+ 
+  <td rowspan="5">እረፍት</td> 
+                <td>እንግሊዝኛ</td>
+            </tr>
+            <tr>
+                <td>ማክሰኞ</td>
+                <td>ሳይንስ</td>
+                <td>እንግሊዝኛ</td>
+                <td>ሒሳብ</td>
+                
+  <td>ስፖርት</td>                         
+            </tr>
+            </tbody>
+    </table>
+</div>
+
+
+
+    <div class="container">
+        <div class="main-content">
+
+           
+            <p>እንኳን ወደ መደበኛ የትምህርት ቤታችን የመረጃ ፖርታል በደህና መጡ።  እዚህ ስለአካዳሚክ ፕሮግራሞቻችን፣ መገልገያዎች እና የትምህርት ቤት ፖሊሲዎች ዝርዝሮችን ማግኘት ይችላሉ።</p>
+
+            <div id="uniform" class="uniform-section">
+                <div class="uniform-image">
+                    <img src="temar.png" width="600" height="400"
+                </div>
+                <div class="uniform-details">
+                    <h2>ይህ የተማሪ ዩኒፎርም ነው።</h2>
+                    <h2><p>ተማሪዎቻችን በመልካቸው ይኮራሉ።</p></h2>
+                   <ul>
+                                            </ul>
+                </div>
+            </div>
+
+        </div>
+    </div>
+<a href="https://t.me/RhobotSchool_et" class="next-btn">ወደ ቴለግራም ቻናላችን ይግቡ &raquo;
+
+<style>
+  .next-btn {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color:SkyBlue; /* ሰመያዊ ቀለም */
+    color: white;
+    text-decoration: none; /* ከስሩ ያለውን መስመር ለማጥፋት */
+    border-radius: 8px; /* ማዕዘኑን ለማድቦልቦል */
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+    transition: 0.3s; /* ሲነካ ቀስ ብሎ እንዲቀየር */
+  }
+
+  .next-btn:hover {
+    background-color: #45a049; /* ማውሱ ሲያርፍበት ትንሽ ይጠቁራል */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+</style>
+</a>
+<script>
+function showTimetable() {
+    var x = document.getElementById("timetable-container");
+    if (x.style.display === "none") {
+        x.style.display = "block"; // እንዲታይ ማድረግ
+    } else {
+        x.style.display = "none";  // መልሶ እንዲደበቅ ማድረግ
+    }
+}
+</script>
+
+</body>
+</html>
