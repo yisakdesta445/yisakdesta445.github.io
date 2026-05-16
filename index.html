@@ -1,265 +1,389 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School Information Portal</title>
-    <style>
-        /* CSS Section - Styling the webpage */
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f7f6;
-            color: #333;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Premium Blood Sugar Tracker</title>
+  <style>
+    :root {
+      --primary-color: #4f46e5;
+      --primary-hover: #4338ca;
+      --success-color: #10b981;
+      --danger-color: #ef4444;
+      --warning-color: #f59e0b;
+      --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --text-color: #1f2937;
+    }
 
-        header {
-            background-color: #2c3e50;
-            color: white;
-            padding: 20px 0;
-            text-align: center;
-        }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg-gradient);
+      margin: 0;
+      padding: 30px 15px;
+      min-height: 100vh;
+      color: var(--text-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
 
-        header h1 {
-            margin: 0;
-            font-size: 2.5em;
-        }
+    .container {
+      width: 100%;
+      max-width: 650px;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 35px;
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+      backdrop-filter: blur(10px);
+    }
 
-        nav {
-            background-color: #34495e;
-            color: white;
-            padding: 10px;
-            text-align: center;
-        }
+    h1, h2 {
+      margin-top: 0;
+      color: #312e81;
+      font-weight: 700;
+      text-align: center;
+    }
 
-        nav a {
-            color: white;
-            text-decoration: none;
-            margin: 0 15px;
-            font-weight: bold;
-        }
+    h1 { font-size: 28px; margin-bottom: 25px; }
+    h2 { font-size: 24px; margin-bottom: 20px; }
 
-        .container {
-            width: 80%;
-            margin: 20px auto;
-            overflow: hidden;
-        }
+    .input-group {
+      margin-bottom: 15px;
+    }
 
-        .main-content {
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
+    input {
+      padding: 12px 16px;
+      margin: 6px 0;
+      width: 100%;
+      font-size: 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      box-sizing: border-box;
+      transition: all 0.3s ease;
+      background: #f9fafb;
+    }
 
-        h2 {
-            color: #2c3e50;
-            border-bottom: 2px solid #27ae60;
-            padding-bottom: 10px;
-        }
+    input:focus {
+      border-color: var(--primary-color);
+      background: #fff;
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
+    }
 
-        .uniform-section {
-            display: flex;
-            align-items: center;
-            gap: 30px;
-            margin-top: 30px;
-        }
+    button {
+      padding: 14px;
+      margin: 10px 0;
+      width: 100%;
+      font-size: 16px;
+      font-weight: 600;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 10px;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);
+    }
 
-        .uniform-image {
-            flex: 1;
-            max-width: 400px;
-        }
+    button:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 12px rgba(79, 70, 229, 0.3);
+    }
 
-        .uniform-image img {
-            width: 100%;
-            height: auto;
-            border-radius: 8px;
-            border: 3px solid #ddd;
-        }
+    button:active {
+      transform: translateY(1px);
+    }
 
-        .uniform-details {
-            flex: 2;
-        }
+    .secondary-btn {
+      background: transparent;
+      color: var(--primary-color);
+      border: 2px solid var(--primary-color);
+      box-shadow: none;
+      margin-top: 5px;
+    }
 
-        .uniform-details ul {
-            list-style-type: none;
-            padding: 0;
-        }
+    .secondary-btn:hover {
+      background: rgba(79, 70, 229, 0.05);
+      box-shadow: none;
+    }
 
-        .uniform-details li {
-            background-color: #e8f8f5;
-            margin: 10px 0;
-            padding: 15px;
-            border-left: 5px solid #27ae60;
-            border-radius: 4px;
-        }
+    .logout-btn {
+      background: #f3f4f6;
+      color: #4b5563;
+      margin-top: 25px;
+      box-shadow: none;
+    }
 
-        .uniform-details li strong {
-            color: #2c3e50;
-        }
+    .logout-btn:hover {
+      background: #e5e7eb;
+      color: #1f2937;
+      box-shadow: none;
+    }
 
-        footer {
-            text-align: center;
-            padding: 20px;
-            background-color: #2c3e50;
-            color: white;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-        }
-nav a {
-    text-decoration: none;
-    padding: 10px 15px;
-    color: white;
-    font-weight: bold;
-}
+    .welcome-box {
+      background: #e0e7ff;
+      padding: 10px 15px;
+      border-radius: 10px;
+      color: #3730a3;
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
 
-nav a.active {
-    background-color: #27ae60; /* የአሁኑ ገጽ መሆኑን ለማሳየት አረንጓዴ ቀለም */
-    border-radius: 5px;
-}
+    .table-container {
+      overflow-x: auto;
+      margin-top: 25px;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+    }
 
-nav a:hover {
-    background-color: #34495e; /* ማውሱ ሲያርፍበት የሚቀየር ቀለም */
-    border-radius: 5px;
-}
-#timetable-container {
-    animation: fadeIn 0.5s; /* ብቅ ሲል ቀስ ብሎ እንዲመጣ */
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    background-color: #f9f9f9;
-}
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      font-size: 15px;
+    }
 
-@keyframes fadeIn {
-    from {opacity: 0;}
-    to {opacity: 1;}
-}
+    th, td {
+      padding: 14px;
+      text-align: center;
+      border-bottom: 1px solid #e5e7eb;
+    }
 
-table, th, td {
-    border: 2px solid black !important; /* መስመሮቹ እንዲታዩ */
-}
+    th {
+      background: #f8fafc;
+      color: #64748b;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+    }
 
-    </style>
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .badge-normal { background: #d1fae5; color: #065f46; }
+    .badge-warning { background: #fef3c7; color: #92400e; }
+    .badge-danger { background: #fee2e2; color: #991b1b; }
+
+    .delete-btn {
+      background: #fee2e2;
+      color: var(--danger-color);
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      width: auto;
+      margin: 0;
+      box-shadow: none;
+    }
+
+    .delete-btn:hover {
+      background: var(--danger-color);
+      color: white;
+      box-shadow: none;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
 </head>
 <body>
-
-    <header>
-        <h1> እንኳን ወደ ርሆቦት ትምህርት ቤት ድህረ ገጽ በዳና መጡ</h1>
-    </header>
-<nav>
-    <a href="index.html" class="active">ዋና ገፅ</a> 
-    </nav>
-<nav class="main-nav">
-    <a href="#" onclick="showTimetable()">ክፍለ ጊዜዎች</a>
-</nav>
-
-<div id="timetable-container" style="display: none; margin-top: 20px;">
-    <h2 style="text-align:center;">የ 8ኛ ክፍለ ጊዜ ሰንጠረዥ</h2>
-    <table border="1" style="width:100%; border-collapse: collapse; text-align: center;">
-        <thead style="background-color: #ADD8E6;">
-            <tr>
-                <th>ቀናት</th>
-                <th>2:30 - 3:00</th>
-                <th>3:30 - 4:00</th>                
-                <th>4:30 - 5:00</th>
-                <th>እረፍት</th>             
-                <th>5:00 - 5:30</th>            
-           
-        </thead>
-        <tbody>
-            <tr>
-                <td>ሰኞ</td>
-                <td>ሒሳብ</td>
-                <td>አማርኛ</td>
-                
- <td>ሶሻል</td>
- 
-  <td rowspan="5">እረፍት</td> 
-                <td>እንግሊዝኛ</td>
-            </tr>
-            <tr>
-                <td>ማክሰኞ</td>
-                <td>ሳይንስ</td>
-                <td>እንግሊዝኛ</td>
-                <td>ሒሳብ</td>
-                
-  <td>ስፖርት</td>                         
-            </tr>
-            </tbody>
-    </table>
-</div>
-
-
-
-    <div class="container">
-        <div class="main-content">
-
-           
-            <p>እንኳን ወደ መደበኛ የትምህርት ቤታችን የመረጃ ፖርታል በደህና መጡ።  እዚህ ስለአካዳሚክ ፕሮግራሞቻችን፣ መገልገያዎች እና የትምህርት ቤት ፖሊሲዎች ዝርዝሮችን ማግኘት ይችላሉ።</p>
-
-            <div id="uniform" class="uniform-section">
-                <div class="uniform-image">
-                    <img src="temar.png" width="600" height="400"
-                </div>
-                <div class="uniform-details">
-            
-                     <h1>የተማሪዎች መብቶች</h1>
-ተማሪዎች በትምህርት ገበታቸው ላይ እያሉ የሚከተሉት መሠረታዊ መብቶች አሏቸው፦
-እኩል የማግኘት መብት፦ በማንኛውም ሁኔታ (በዘር፣ በሃይማኖት፣ በጾታ ወይም በሌላ) ሳይበላለጡ እኩል ትምህርት የማግኘት መብት።
-ሐሳብን የመግለጽ መብት፦ በትምህርት ሂደት ውስጥ ጥያቄዎችን የመጠየቅ፣ የራስን ሐሳብ በነፃነትና በሥርዓት የማንጸባረቅ መብት።
-ከጥቃት የመጠበቅ መብት፦ በትምህርት ቤት ግቢ ውስጥ ከማንኛውም አካላዊና ሥነ-ልቦናዊ ጥቃት (ተገቢ ካልሆነ ቅጣትና ጉልበት ብዝበዛ) የመጠበቅ መብት።
-የመረጃ መብት፦ ስለ ትምህርት ውጤታቸው፣ ስለ ትምህርት ቤቱ ደንቦችና ስለሚሰጡ አገልግሎቶች በቂ መረጃ የማግኘት መብት።
-ፍትሐዊ ግምገማ፦ የትምህርት አፈጻጸማቸው በግልጽና ፍትሐዊ በሆነ መንገድ የመመዘን መብት።
-
-<h2>የተማሪዎች ግዴታዎች</h2>
-መብቶችን ለመጠቀም የሚከተሉትን ግዴታዎች መወጣት ይጠበቅባቸዋል፦
-የትምህርት ቤቱን ደንብ ማክበር፦ የትምህርት ቤቱን የደንብ ልብስ መልበስ፣ በሰዓቱ መገኘትና መመሪያዎችን ማክበር።
-ለትምህርት ትኩረት መስጠት፦ ትምህርትን በአግባቡ መከታተል፣ የቤት ሥራዎችንና ጥናቶችን በወቅቱ ማከናወን።
-ንብረት መንከባከብ፦ የትምህርት ቤቱን ቁሳቁሶች (ቤተ-መጻሕፍት፣ ላቦራቶሪ፣ ወንበሮች) በአግባቡ መጠቀምና መጠበቅ።
-ለሌሎች እውቅና መስጠት፦ ለመምህራን፣ ለትምህርት ቤት ሠራተኞችና ለሌሎች ተማሪዎች ተገቢውን ክብር መስጠት።
-ከሱስና ከብጥብጥ መራቅ፦ በትምህርት ቤት አካባቢ ጸረ-ሰላም ከሆኑ ድርጊቶችና ከተለያዩ ሱሶች ራስን ማራቅ።
-                    <h2><p>ተማሪዎቻችን በመልካቸው ይኮራሉ።</p></h2>
-                   <ul>
-                                            </ul>
-                </div>
-            </div>
-
-        </div>
+  <div class="container">
+    
+    <!-- 1. የሎግኢን እና አካውንት መፍጠሪያ ክፍል -->
+    <div id="auth-section">
+      <h2 id="auth-title">Log In</h2>
+      <div class="input-group">
+        <input type="text" id="username" placeholder="Username (የመለያ ስም)" />
+        <input type="password" id="password" placeholder="Password (የምስጢር ቁጥር)" />
+      </div>
+      <button id="main-auth-btn" onclick="login()">Log In</button>
+      <button class="secondary-btn" id="toggle-auth-btn" onclick="toggleAuthMode()">Create an Account</button>
     </div>
-<a href="https://t.me/RhobotSchool_et" class="next-btn">ወደ ቴለግራም ቻናላችን ይግቡ &raquo;
 
-<style>
-  .next-btn {
-    display: inline-block;
-    padding: 12px 24px;
-    background-color:SkyBlue; /* ሰመያዊ ቀለም */
-    color: white;
-    text-decoration: none; /* ከስሩ ያለውን መስመር ለማጥፋት */
-    border-radius: 8px; /* ማዕዘኑን ለማድቦልቦል */
-    font-family: Arial, sans-serif;
-    font-weight: bold;
-    transition: 0.3s; /* ሲነካ ቀስ ብሎ እንዲቀየር */
-  }
+    <!-- 2. ዋናው የስኳር መከታተያ ክፍል -->
+    <div id="tracker-section" class="hidden">
+      <h1>Blood Sugar Tracker</h1>
+      
+      <div class="welcome-box">
+        <span>Welcome, <strong id="user-display"></strong>! 👋</span>
+      </div>
+      
+      <div class="input-group">
+        <input type="number" id="sugar" placeholder="Enter blood sugar level (mg/dL)" />
+        <input type="text" id="note" placeholder="Note (e.g. fasting, after meal)" />
+      </div>
+      <button onclick="addRecord()">Add New Record</button>
 
-  .next-btn:hover {
-    background-color: #45a049; /* ማውሱ ሲያርፍበት ትንሽ ይጠቁራል */
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-  }
-</style>
-</a>
-<script>
-function showTimetable() {
-    var x = document.getElementById("timetable-container");
-    if (x.style.display === "none") {
-        x.style.display = "block"; // እንዲታይ ማድረግ
-    } else {
-        x.style.display = "none";  // መልሶ እንዲደበቅ ማድረግ
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Level</th>
+              <th>Note</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="records"></tbody>
+        </table>
+      </div>
+
+      <button class="logout-btn" onclick="logout()">Log Out</button>
+    </div>
+
+  </div>
+
+  <script>
+    let users = JSON.parse(localStorage.getItem("sugarUsers")) || {};
+    let currentUser = localStorage.getItem("currentSugarUser") || null;
+    let isLoginMode = true;
+
+    if (currentUser) {
+      showTracker();
     }
-}
-</script>
 
+    function toggleAuthMode() {
+      isLoginMode = !isLoginMode;
+      const title = document.getElementById("auth-title");
+      const mainBtn = document.getElementById("main-auth-btn");
+      const toggleBtn = document.getElementById("toggle-auth-btn");
+
+      if (isLoginMode) {
+        title.innerText = "Log In";
+        mainBtn.innerText = "Log In";
+        toggleBtn.innerText = "Create an Account";
+      } else {
+        title.innerText = "Create Account";
+        mainBtn.innerText = "Register & Log In";
+        toggleBtn.innerText = "Already have an account? Log In";
+      }
+    }
+
+    function login() {
+      const user = document.getElementById("username").value.trim().toLowerCase();
+      const pass = document.getElementById("password").value;
+
+      if (!user || !pass) return alert("Please fill in all fields");
+
+      if (isLoginMode) {
+        if (users[user] && users[user].password === pass) {
+          currentUser = user;
+          localStorage.setItem("currentSugarUser", currentUser);
+          showTracker();
+        } else {
+          alert("Incorrect username or password!");
+        }
+      } else {
+        if (users[user]) {
+          return alert("Username already exists!");
+        }
+        
+        users[user] = { password: pass, data: [] };
+        localStorage.setItem("sugarUsers", JSON.stringify(users));
+        currentUser = user;
+        localStorage.setItem("currentSugarUser", currentUser);
+        showTracker();
+      }
+
+      document.getElementById("username").value = "";
+      document.getElementById("password").value = "";
+    }
+
+    function showTracker() {
+      document.getElementById("auth-section").classList.add("hidden");
+      document.getElementById("tracker-section").classList.remove("hidden");
+      document.getElementById("user-display").innerText = currentUser.toUpperCase();
+      render();
+    }
+
+    function logout() {
+      currentUser = null;
+      localStorage.removeItem("currentSugarUser");
+      document.getElementById("auth-section").classList.remove("hidden");
+      document.getElementById("tracker-section").classList.add("hidden");
+    }
+
+    // የደም ስኳር መጠንን አይቶ ከለር የሚቀይር ተግባር
+    function getSugarBadge(level) {
+      const num = parseInt(level);
+      if (num < 70) {
+        return `<span class="badge badge-danger">${num} mg/dL (Low)</span>`;
+      } else if (num <= 140) {
+        return `<span class="badge badge-normal">${num} mg/dL (Normal)</span>`;
+      } else if (num <= 199) {
+        return `<span class="badge badge-warning">${num} mg/dL (High)</span>`;
+      } else {
+        return `<span class="badge badge-danger">${num} mg/dL (Very High)</span>`;
+      }
+    }
+
+    function render() {
+      const table = document.getElementById("records");
+      table.innerHTML = "";
+
+      let userData = users[currentUser].data || [];
+
+      if (userData.length === 0) {
+        table.innerHTML = `<tr><td colspan="4" style="color: #9ca3af; padding: 20px;">No records found. Start tracking!</td></tr>`;
+        return;
+      }
+
+      userData.forEach((item, index) => {
+        table.innerHTML += `
+          <tr>
+            <td style="color: #4b5563; font-size: 14px;">${item.date}</td>
+            <td>${getSugarBadge(item.level)}</td>
+            <td style="color: #4b5563;">${item.note || '-'}</td>
+            <td><button class="delete-btn" onclick="deleteRecord(${index})">Delete</button></td>
+          </tr>
+        `;
+      });
+    }
+
+    function addRecord() {
+      const level = document.getElementById("sugar").value;
+      const note = document.getElementById("note").value;
+
+      if (!level) return alert("Please enter a blood sugar level");
+
+      const record = {
+        date: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+        level: level,
+        note: note
+      };
+
+      users[currentUser].data.unshift(record);
+      localStorage.setItem("sugarUsers", JSON.stringify(users));
+
+      document.getElementById("sugar").value = "";
+      document.getElementById("note").value = "";
+
+      render();
+    }
+
+    function deleteRecord(index) {
+      if(confirm("Are you sure you want to delete this record?")) {
+        users[currentUser].data.splice(index, 1);
+        localStorage.setItem("sugarUsers", JSON.stringify(users));
+        render();
+      }
+    }
+  </script>
 </body>
 </html>
