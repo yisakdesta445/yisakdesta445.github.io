@@ -2,7 +2,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Premium Blood Sugar Tracker</title>
+  <title>Premium Blood Sugar Tracker (Final Fixed)</title>
   <style>
     :root {
       --primary-color: #4f46e5;
@@ -36,7 +36,7 @@
       backdrop-filter: blur(10px);
     }
 
-    h1, h2 {
+    h1, h2, h3 {
       margin-top: 0;
       color: #312e81;
       font-weight: 700;
@@ -45,9 +45,17 @@
 
     h1 { font-size: 28px; margin-bottom: 25px; }
     h2 { font-size: 24px; margin-bottom: 20px; }
+    h3 { font-size: 20px; margin-bottom: 15px; text-align: left; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; }
 
     .input-group {
       margin-bottom: 15px;
+    }
+
+    .password-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
     }
 
     input {
@@ -67,6 +75,22 @@
       background: #fff;
       outline: none;
       box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 15px;
+      cursor: pointer;
+      font-size: 18px;
+      user-select: none;
+      color: #64748b;
+      transition: color 0.2s;
+      display: flex;
+      align-items: center;
+      z-index: 10;
+    }
+    .toggle-password:hover {
+      color: var(--primary-color);
     }
 
     button {
@@ -90,8 +114,11 @@
       box-shadow: 0 6px 12px rgba(79, 70, 229, 0.3);
     }
 
-    button:active {
-      transform: translateY(1px);
+    button:disabled {
+      background: #9ca3af !important;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
     }
 
     .secondary-btn {
@@ -102,133 +129,137 @@
       margin-top: 5px;
     }
 
-    .secondary-btn:hover {
-      background: rgba(79, 70, 229, 0.05);
-      box-shadow: none;
-    }
-
-    .logout-btn {
-      background: #f3f4f6;
-      color: #4b5563;
-      margin-top: 25px;
-      box-shadow: none;
-    }
-
-    .logout-btn:hover {
-      background: #e5e7eb;
-      color: #1f2937;
-      box-shadow: none;
-    }
-
-    .welcome-box {
-      background: #e0e7ff;
-      padding: 10px 15px;
-      border-radius: 10px;
-      color: #3730a3;
-      font-size: 14px;
+    .profile-card {
+      background: #ffffff;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      margin-bottom: 25px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      gap: 20px;
+      border: 1px solid #e2e8f0;
     }
 
-    .table-container {
-      overflow-x: auto;
-      margin-top: 25px;
-      border-radius: 12px;
-      border: 1px solid #e5e7eb;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: white;
-      font-size: 15px;
-    }
-
-    th, td {
-      padding: 14px;
-      text-align: center;
-      border-bottom: 1px solid #e5e7eb;
-    }
-
-    th {
-      background: #f8fafc;
-      color: #64748b;
-      font-weight: 600;
+    .profile-avatar {
+      width: 70px;
+      height: 70px;
+      background: var(--primary-color);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: bold;
       text-transform: uppercase;
-      font-size: 12px;
-      letter-spacing: 0.5px;
+      box-shadow: 0 4px 8px rgba(79, 70, 229, 0.3);
     }
 
-    tr:last-child td {
-      border-bottom: none;
-    }
+    .profile-info { flex: 1; }
+    .profile-info h4 { margin: 0 0 5px 0; font-size: 18px; color: #1e1b4b; }
+    .profile-info p { margin: 2px 0; font-size: 13px; color: #64748b; }
 
-    .badge {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 20px;
+    .edit-profile-trigger {
+      background: #f1f5f9;
+      color: #475569;
+      padding: 8px 12px;
       font-size: 13px;
-      font-weight: 600;
-    }
-
-    .badge-normal { background: #d1fae5; color: #065f46; }
-    .badge-warning { background: #fef3c7; color: #92400e; }
-    .badge-danger { background: #fee2e2; color: #991b1b; }
-
-    .delete-btn {
-      background: #fee2e2;
-      color: var(--danger-color);
-      padding: 6px 12px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 600;
+      border-radius: 8px;
       width: auto;
       margin: 0;
       box-shadow: none;
     }
+    .edit-profile-trigger:hover { background: #e2e8f0; color: #1e293b; }
 
-    .delete-btn:hover {
-      background: var(--danger-color);
-      color: white;
-      box-shadow: none;
+    .settings-box {
+      background: #f8fafc;
+      padding: 20px;
+      border-radius: 15px;
+      border: 1px solid #e2e8f0;
+      margin-top: 20px;
+      animation: fadeIn 0.3s ease-in-out;
     }
 
-    .hidden {
-      display: none;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
+
+    .logout-btn { background: #fee2e2; color: var(--danger-color); margin-top: 25px; box-shadow: none; }
+    .logout-btn:hover { background: var(--danger-color); color: white; }
+
+    .table-container { overflow-x: auto; margin-top: 25px; border-radius: 12px; border: 1px solid #e5e7eb; }
+    table { width: 100%; border-collapse: collapse; background: white; font-size: 15px; }
+    th, td { padding: 14px; text-align: center; border-bottom: 1px solid #e5e7eb; }
+    th { background: #f8fafc; color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 12px; }
+
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+    .badge-normal { background: #d1fae5; color: #065f46; }
+    .badge-warning { background: #fef3c7; color: #92400e; }
+    .badge-danger { background: #fee2e2; color: #991b1b; }
+
+    .delete-btn { background: #fee2e2; color: var(--danger-color); padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; }
+    .delete-btn:hover { background: var(--danger-color); color: white; }
+    .hidden { display: none; }
   </style>
 </head>
 <body>
   <div class="container">
     
-    <!-- 1. የሎግኢን እና አካውንት መፍጠሪያ ክፍል -->
     <div id="auth-section">
       <h2 id="auth-title">Log In</h2>
       <div class="input-group">
+        <input type="text" id="reg-fullname" class="hidden" placeholder="Full Name (ሙሉ ስም)" />
         <input type="text" id="username" placeholder="Username (የመለያ ስም)" />
-        <input type="password" id="password" placeholder="Password (የምስጢር ቁጥር)" />
+        
+        <div class="password-wrapper">
+          <input type="password" id="password" placeholder="Password (የምስጢር ቁጥር)" />
+          <span class="toggle-password" onclick="togglePasswordVisibility('password', this)">👁️</span>
+        </div>
       </div>
       <button id="main-auth-btn" onclick="login()">Log In</button>
       <button class="secondary-btn" id="toggle-auth-btn" onclick="toggleAuthMode()">Create an Account</button>
     </div>
 
-    <!-- 2. ዋናው የስኳር መከታተያ ክፍል -->
     <div id="tracker-section" class="hidden">
       <h1>Blood Sugar Tracker</h1>
       
-      <div class="welcome-box">
-        <span>Welcome, <strong id="user-display"></strong>! 👋</span>
+      <div class="profile-card">
+        <div class="profile-avatar" id="user-avatar">-</div>
+        <div class="profile-info">
+          <h4 id="user-fullname-display">Loading Name...</h4>
+          <p>Username: <strong id="user-username-display">@username</strong></p>
+          <p>Total Records: <strong id="user-total-records">0</strong></p>
+          <p>Joined: <span id="user-joined-date">Today</span></p>
+        </div>
+        <button class="edit-profile-trigger" onclick="toggleEditProfile()">Edit Profile ⚙️</button>
+      </div>
+
+      <div id="edit-profile-box" class="settings-box hidden">
+        <h3>Edit Profile 📝</h3>
+        <div class="input-group">
+          <label style="font-size: 13px; font-weight: 600; color: #475569;">Update Full Name</label>
+          <input type="text" id="edit-fullname" placeholder="Full Name" />
+          
+          <label style="font-size: 13px; font-weight: 600; color: #475569; margin-top: 8px; display:block;">Update Username</label>
+          <input type="text" id="edit-username" placeholder="Username" />
+          
+          <label style="font-size: 13px; font-weight: 600; color: #475569; margin-top: 8px; display:block;">Change Password</label>
+          <div class="password-wrapper">
+            <input type="password" id="edit-password" placeholder="Leave blank to keep current" />
+            <span class="toggle-password" onclick="togglePasswordVisibility('edit-password', this)">👁️</span>
+          </div>
+        </div>
+        <button id="save-profile-btn" style="background:#4b5563;" onclick="updateProfileSettings()">Save Changes</button>
+        <button class="secondary-btn" style="border-color:#94a3b8; color:#64748b;" onclick="toggleEditProfile()">Cancel</button>
       </div>
       
-      <div class="input-group">
-        <input type="number" id="sugar" placeholder="Enter blood sugar level (mg/dL)" />
+      <div class="input-group" style="margin-top:20px;">
+        <input type="number" id="sugar" placeholder="Enter blood sugar level (mg/dL)" min="10" max="600" />
         <input type="text" id="note" placeholder="Note (e.g. fasting, after meal)" />
       </div>
-      <button onclick="addRecord()">Add New Record</button>
+      <button id="add-record-btn" onclick="addRecord()">Add New Record</button>
 
       <div class="table-container">
         <table>
@@ -244,147 +275,285 @@
         </table>
       </div>
 
-      <button class="logout-btn" onclick="logout()">Log Out</button>
+      <button class="logout-btn" onclick="logout()">Log Out / Account Exit</button>
     </div>
 
   </div>
 
   <script>
-    let users = JSON.parse(localStorage.getItem("sugarUsers")) || {};
-    let currentUser = localStorage.getItem("currentSugarUser") || null;
+    const DATABASE_URL = "https://yddj-13184-default-rtdb.firebaseio.com/"; 
+
+    let currentUserKey = localStorage.getItem("currentSugarUserKey") || null;
     let isLoginMode = true;
 
-    if (currentUser) {
-      showTracker();
+    // 🌟 አሁን በትክክል እዚህ ጋር ተቀምጧል!
+    function togglePasswordVisibility(inputId, iconElement) {
+      const passwordInput = document.getElementById(inputId);
+      if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        iconElement.innerText = "🙈";
+      } else {
+        passwordInput.type = "password";
+        iconElement.innerText = "👁️";
+      }
     }
+
+    function hashPassword(password) {
+      let hash = 0;
+      for (let i = 0; i < password.length; i++) {
+        const char = password.charCodeAt(i);
+        hash = (hash << 5) - hash + char;
+        hash = hash & hash; 
+      }
+      return hash.toString(16);
+    }
+
+    if (currentUserKey) { showTracker(); }
 
     function toggleAuthMode() {
       isLoginMode = !isLoginMode;
       const title = document.getElementById("auth-title");
       const mainBtn = document.getElementById("main-auth-btn");
       const toggleBtn = document.getElementById("toggle-auth-btn");
-
-      if (isLoginMode) {
-        title.innerText = "Log In";
-        mainBtn.innerText = "Log In";
-        toggleBtn.innerText = "Create an Account";
-      } else {
-        title.innerText = "Create Account";
-        mainBtn.innerText = "Register & Log In";
-        toggleBtn.innerText = "Already have an account? Log In";
-      }
-    }
-
-    function login() {
-      const user = document.getElementById("username").value.trim().toLowerCase();
-      const pass = document.getElementById("password").value;
-
-      if (!user || !pass) return alert("Please fill in all fields");
-
-      if (isLoginMode) {
-        if (users[user] && users[user].password === pass) {
-          currentUser = user;
-          localStorage.setItem("currentSugarUser", currentUser);
-          showTracker();
-        } else {
-          alert("Incorrect username or password!");
-        }
-      } else {
-        if (users[user]) {
-          return alert("Username already exists!");
-        }
-        
-        users[user] = { password: pass, data: [] };
-        localStorage.setItem("sugarUsers", JSON.stringify(users));
-        currentUser = user;
-        localStorage.setItem("currentSugarUser", currentUser);
-        showTracker();
-      }
-
+      const fullNameField = document.getElementById("reg-fullname");
+      
       document.getElementById("username").value = "";
       document.getElementById("password").value = "";
+      fullNameField.value = "";
+
+      if (isLoginMode) {
+        title.innerText = "Log In"; mainBtn.innerText = "Log In"; toggleBtn.innerText = "Create an Account";
+        fullNameField.classList.add("hidden");
+      } else {
+        title.innerText = "Create Account"; mainBtn.innerText = "Register & Log In"; toggleBtn.innerText = "Already have an account? Log In";
+        fullNameField.classList.remove("hidden");
+      }
     }
 
-    function showTracker() {
+    function toggleEditProfile() {
+      const box = document.getElementById("edit-profile-box");
+      box.classList.toggle("hidden");
+    }
+
+    async function firebaseRequest(path, method = "GET", data = null) {
+      const options = { method, headers: { "Content-Type": "application/json" } };
+      if (data) options.body = JSON.stringify(data);
+      try {
+        const res = await fetch(`${DATABASE_URL}${path}.json`, options);
+        return res.json();
+      } catch (error) {
+        console.error("Database Error:", error);
+        alert("የዳታቤዝ ግንኙነት ስህተት ተፈጥሯል!");
+        return null;
+      }
+    }
+
+    async function login() {
+      const userField = document.getElementById("username");
+      const passField = document.getElementById("password");
+      const fullNameField = document.getElementById("reg-fullname");
+      const mainBtn = document.getElementById("main-auth-btn");
+      
+      const user = userField.value.trim();
+      const pass = passField.value;
+      const fullname = fullNameField.value.trim();
+
+      if (!user || !pass) return alert("Please fill in all fields");
+      if (pass.length < 4) return alert("Password must be at least 4 characters");
+      if (!isLoginMode && !fullname) return alert("Please enter your Full Name");
+
+      mainBtn.innerText = "Connecting... Please wait... ⏳";
+      mainBtn.disabled = true;
+
+      const hashedPassword = hashPassword(pass);
+      const allUsers = await firebaseRequest("/users");
+
+      if (isLoginMode) {
+        let foundUserKey = null;
+        if (allUsers) {
+          for (const key in allUsers) {
+            if (allUsers[key].username && allUsers[key].username.toLowerCase() === user.toLowerCase() && allUsers[key].password === hashedPassword) {
+              foundUserKey = key;
+              break;
+            }
+          }
+        }
+
+        mainBtn.innerText = "Log In";
+        mainBtn.disabled = false;
+
+        if (foundUserKey) {
+          userField.value = ""; passField.value = "";
+          currentUserKey = foundUserKey;
+          localStorage.setItem("currentSugarUserKey", currentUserKey);
+          showTracker();
+        } else { alert("Incorrect username or password!"); }
+      } else {
+        let usernameExists = false;
+        if (allUsers) {
+          for (const key in allUsers) {
+            if (allUsers[key].username && allUsers[key].username.toLowerCase() === user.toLowerCase()) {
+              usernameExists = true;
+              break;
+            }
+          }
+        }
+
+        if (usernameExists) { 
+          mainBtn.innerText = "Register & Log In"; mainBtn.disabled = false;
+          return alert("Username already taken! Choose another one."); 
+        }
+        
+        const newUser = {
+          fullname: fullname,
+          username: user,
+          password: hashedPassword,
+          joinedDate: new Date().toLocaleDateString()
+        };
+
+        const res = await firebaseRequest("/users", "POST", newUser);
+        mainBtn.innerText = "Register & Log In"; mainBtn.disabled = false;
+
+        if(res && res.name) {
+          userField.value = ""; passField.value = ""; fullNameField.value = "";
+          alert("🎉 Account Created Successfully!");
+          currentUserKey = res.name;
+          localStorage.setItem("currentSugarUserKey", currentUserKey);
+          showTracker();
+        }
+      }
+    }
+
+    async function showTracker() {
       document.getElementById("auth-section").classList.add("hidden");
       document.getElementById("tracker-section").classList.remove("hidden");
-      document.getElementById("user-display").innerText = currentUser.toUpperCase();
+      
+      const userData = await firebaseRequest(`/users/${currentUserKey}`);
+      if(userData) {
+        document.getElementById("user-fullname-display").innerText = userData.fullname || "User";
+        document.getElementById("user-username-display").innerText = "@" + (userData.username || "username");
+        document.getElementById("user-avatar").innerText = (userData.fullname || "U").charAt(0);
+        document.getElementById("user-joined-date").innerText = userData.joinedDate || "N/A";
+        
+        document.getElementById("edit-fullname").value = userData.fullname || "";
+        document.getElementById("edit-username").value = userData.username || "";
+      }
       render();
     }
 
+    async function updateProfileSettings() {
+      const editFullname = document.getElementById("edit-fullname").value.trim();
+      const editUsername = document.getElementById("edit-username").value.trim();
+      const editPassword = document.getElementById("edit-password").value;
+      const saveBtn = document.getElementById("save-profile-btn");
+
+      if(!editFullname || !editUsername) return alert("Full Name and Username cannot be empty!");
+
+      saveBtn.innerText = "Saving Profile... ⏳"; saveBtn.disabled = true;
+
+      const userData = await firebaseRequest(`/users/${currentUserKey}`);
+      if(userData) {
+        userData.fullname = editFullname;
+        userData.username = editUsername;
+        if(editPassword) {
+          if(editPassword.length < 4) {
+            saveBtn.innerText = "Save Changes"; saveBtn.disabled = false;
+            return alert("New password must be at least 4 characters!");
+          }
+          userData.password = hashPassword(editPassword);
+        }
+
+        const res = await firebaseRequest(`/users/${currentUserKey}`, "PATCH", userData);
+        if(res) {
+          alert("⚙️ Profile Updated Successfully!");
+          document.getElementById("edit-password").value = "";
+          toggleEditProfile();
+          showTracker();
+        }
+      }
+      saveBtn.innerText = "Save Changes"; saveBtn.disabled = false;
+    }
+
     function logout() {
-      currentUser = null;
-      localStorage.removeItem("currentSugarUser");
+      currentUserKey = null;
+      localStorage.removeItem("currentSugarUserKey");
+      document.getElementById("edit-profile-box").classList.add("hidden");
       document.getElementById("auth-section").classList.remove("hidden");
       document.getElementById("tracker-section").classList.add("hidden");
     }
 
-    // የደም ስኳር መጠንን አይቶ ከለር የሚቀይር ተግባር
     function getSugarBadge(level) {
       const num = parseInt(level);
-      if (num < 70) {
-        return `<span class="badge badge-danger">${num} mg/dL (Low)</span>`;
-      } else if (num <= 140) {
-        return `<span class="badge badge-normal">${num} mg/dL (Normal)</span>`;
-      } else if (num <= 199) {
-        return `<span class="badge badge-warning">${num} mg/dL (High)</span>`;
-      } else {
-        return `<span class="badge badge-danger">${num} mg/dL (Very High)</span>`;
-      }
+      if (num < 70) return `<span class="badge badge-danger">${num} mg/dL (Low)</span>`;
+      if (num <= 140) return `<span class="badge badge-normal">${num} mg/dL (Normal)</span>`;
+      if (num <= 199) return `<span class="badge badge-warning">${num} mg/dL (High)</span>`;
+      return `<span class="badge badge-danger">${num} mg/dL (Very High)</span>`;
     }
 
-    function render() {
+    function escapeHTML(str) {
+      if(!str) return '';
+      return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
+    }
+
+    async function render() {
       const table = document.getElementById("records");
+      table.innerHTML = `<tr><td colspan="4" style="color: #9ca3af; padding: 20px;">Loading records from Cloud...</td></tr>`;
+
+      const data = await firebaseRequest(`/users/${currentUserKey}/records`);
       table.innerHTML = "";
 
-      let userData = users[currentUser].data || [];
-
-      if (userData.length === 0) {
+      if (!data) {
         table.innerHTML = `<tr><td colspan="4" style="color: #9ca3af; padding: 20px;">No records found. Start tracking!</td></tr>`;
+        document.getElementById("user-total-records").innerText = "0";
         return;
       }
 
-      userData.forEach((item, index) => {
+      const recordKeys = Object.keys(data);
+      document.getElementById("user-total-records").innerText = recordKeys.length;
+
+      recordKeys.reverse().forEach(key => {
+        const item = data[key];
         table.innerHTML += `
           <tr>
             <td style="color: #4b5563; font-size: 14px;">${item.date}</td>
             <td>${getSugarBadge(item.level)}</td>
-            <td style="color: #4b5563;">${item.note || '-'}</td>
-            <td><button class="delete-btn" onclick="deleteRecord(${index})">Delete</button></td>
+            <td style="color: #4b5563;">${escapeHTML(item.note) || '-'}</td>
+            <td><button class="delete-btn" onclick="deleteRecord('${key}')">Delete</button></td>
           </tr>
         `;
       });
     }
 
-    function addRecord() {
-      const level = document.getElementById("sugar").value;
-      const note = document.getElementById("note").value;
+    async function addRecord() {
+      const levelInput = document.getElementById("sugar");
+      const noteInput = document.getElementById("note");
+      const addBtn = document.getElementById("add-record-btn");
+      const level = levelInput.value;
+      const note = noteInput.value.trim();
 
-      if (!level) return alert("Please enter a blood sugar level");
+      if (!level) return alert("Please enter blood sugar level");
+      if (parseInt(level) < 10 || parseInt(level) > 600) return alert("Please enter a realistic level (10 - 600)");
+
+      addBtn.innerText = "Saving... ⏳"; addBtn.disabled = true;
 
       const record = {
         date: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-        level: level,
+        level: parseInt(level),
         note: note
       };
 
-      users[currentUser].data.unshift(record);
-      localStorage.setItem("sugarUsers", JSON.stringify(users));
-
-      document.getElementById("sugar").value = "";
-      document.getElementById("note").value = "";
-
+      await firebaseRequest(`/users/${currentUserKey}/records`, "POST", record);
+      addBtn.innerText = "Add New Record"; addBtn.disabled = false;
+      levelInput.value = ""; noteInput.value = "";
       render();
     }
 
-    function deleteRecord(index) {
-      if(confirm("Are you sure you want to delete this record?")) {
-        users[currentUser].data.splice(index, 1);
-        localStorage.setItem("sugarUsers", JSON.stringify(users));
+    async function deleteRecord(key) {
+      if(confirm("Are you sure you want to delete this record from Cloud?")) {
+        await firebaseRequest(`/users/${currentUserKey}/records/${key}`, "DELETE");
         render();
       }
     }
   </script>
 </body>
 </html>
-
