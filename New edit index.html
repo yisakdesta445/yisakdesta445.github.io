@@ -1,559 +1,522 @@
 <!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Premium Blood Sugar Tracker (Final Fixed)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Sugar Log & Dashboard Portal</title>
   <style>
     :root {
-      --primary-color: #4f46e5;
-      --primary-hover: #4338ca;
-      --success-color: #10b981;
-      --danger-color: #ef4444;
-      --warning-color: #f59e0b;
-      --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      --text-color: #1f2937;
+      --primary-color: #00f2fe; 
+      --accent-color: #fe2c55;   
+      --dark-bg: #000000;
+      --card-bg: #16161e;
+      --input-bg: #1f1f2e;
+      --text-muted: #86868b;
+      --sugar-good: #4cd964; 
+      --sugar-bad: #ff3b30;  
     }
 
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: var(--bg-gradient);
-      margin: 0;
-      padding: 30px 15px;
-      min-height: 100vh;
-      color: var(--text-color);
-      display: flex;
-      justify-content: center;
-      align-items: center;
+    html, body {
+      margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #000; display: flex; justify-content: center; align-items: center; color: #fff;
     }
 
-    .container {
-      width: 100%;
-      max-width: 650px;
-      background: rgba(255, 255, 255, 0.95);
-      padding: 35px;
-      border-radius: 20px;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-      backdrop-filter: blur(10px);
+    .app-container {
+      width: 100%; max-width: 500px; height: 100%; background: #000;
+      display: flex; flex-direction: column; position: relative; box-shadow: 0 25px 50px rgba(0,0,0,0.8);
     }
 
-    h1, h2, h3 {
-      margin-top: 0;
-      color: #312e81;
-      font-weight: 700;
-      text-align: center;
+    @media (min-width: 500px) {
+      .app-container { height: 88vh; border-radius: 30px; overflow: hidden; border: 1px solid #222; }
     }
 
-    h1 { font-size: 28px; margin-bottom: 25px; }
-    h2 { font-size: 24px; margin-bottom: 20px; }
-    h3 { font-size: 20px; margin-bottom: 15px; text-align: left; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; }
-
-    .input-group {
-      margin-bottom: 15px;
+    /* 📌 Top Header Bar */
+    .app-header {
+      padding: 16px; background: rgba(22, 22, 30, 0.95);
+      position: absolute; top: 0; width: 100%; z-index: 20; box-sizing: border-box;
+      border-bottom: 0.5px solid rgba(255, 255, 255, 0.1);
+      display: flex; justify-content: space-between; align-items: center;
     }
+    
+    .app-title { font-size: 18px; font-weight: 800; color: var(--primary-color); margin: 0; }
 
-    .password-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-      width: 100%;
-    }
+    .app-content { flex: 1; overflow: hidden; position: relative; background: #000; }
 
-    input {
-      padding: 12px 16px;
-      margin: 6px 0;
-      width: 100%;
-      font-size: 16px;
-      border: 2px solid #e5e7eb;
-      border-radius: 10px;
-      box-sizing: border-box;
-      transition: all 0.3s ease;
-      background: #f9fafb;
+    /* 📱 Bottom Nav Bar */
+    .bottom-nav {
+      height: 60px; background: #16161e; border-top: 0.5px solid rgba(255, 255, 255, 0.1);
+      display: flex; justify-content: space-around; align-items: center; z-index: 20; position: relative;
     }
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: none; border: none; color: rgba(255, 255, 255, 0.6);
+      cursor: pointer; font-size: 11px; font-weight: 500; width: 33.33%; height: 100%; gap: 3px;
+    }
+    .nav-item .icon { font-size: 20px; }
+    .nav-item.active { color: var(--primary-color); font-weight: 700; }
 
-    input:focus {
-      border-color: var(--primary-color);
-      background: #fff;
-      outline: none;
-      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
+    /* Auth Box */
+    .auth-box { padding: 120px 30px 30px; text-align: center; background: #000; height: 100%; box-sizing: border-box; z-index: 25; position: absolute; top:0; left:0; width:100%; overflow-y: auto; }
+    .pass-container { position: relative; width: 100%; }
+    .pass-toggle { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-muted); z-index: 10; user-select: none; }
+    input, textarea, select {
+      padding: 16px; margin: 10px 0; width: 100%; font-size: 15px; border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; box-sizing: border-box; background: var(--input-bg); color: #fff; outline: none;
     }
-
-    .toggle-password {
-      position: absolute;
-      right: 15px;
-      cursor: pointer;
-      font-size: 18px;
-      user-select: none;
-      color: #64748b;
-      transition: color 0.2s;
-      display: flex;
-      align-items: center;
-      z-index: 10;
-    }
-    .toggle-password:hover {
-      color: var(--primary-color);
-    }
-
+    input:focus, select:focus { border-color: var(--primary-color); }
     button {
-      padding: 14px;
-      margin: 10px 0;
-      width: 100%;
-      font-size: 16px;
-      font-weight: 600;
-      background: var(--primary-color);
-      color: white;
-      border: none;
-      cursor: pointer;
-      border-radius: 10px;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);
+      padding: 16px; margin: 12px 0; width: 100%; font-size: 16px; font-weight: 700; background: var(--primary-color); color: black; border: none; border-radius: 14px; cursor: pointer;
     }
+    button:disabled { background: var(--text-muted); cursor: not-allowed; }
+    .secondary-btn { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.2); }
 
-    button:hover {
-      background: var(--primary-hover);
-      transform: translateY(-1px);
-      box-shadow: 0 6px 12px rgba(79, 70, 229, 0.3);
+    /* 📚 HOME PAGE: EXPANDABLE PORTAL STYLES */
+    .info-container { padding: 90px 16px 20px; height: 100%; box-sizing: border-box; overflow-y: auto; }
+    .info-card { 
+      background: var(--card-bg); border-radius: 16px; padding: 16px; margin-bottom: 14px; 
+      border: 0.5px solid rgba(255,255,255,0.05); cursor: pointer; transition: all 0.3s ease;
+      position: relative;
     }
-
-    button:disabled {
-      background: #9ca3af !important;
-      cursor: not-allowed;
-      transform: none !important;
-      box-shadow: none !important;
+    .info-card:active { transform: scale(0.98); background: #1f1f2e; }
+    .info-card h3 { margin-top: 0; color: var(--primary-color); font-size: 16px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .info-card p { font-size: 14px; color: #e5e5e5; line-height: 1.6; margin-bottom: 0; }
+    .info-badge { background: rgba(0, 242, 254, 0.1); color: var(--primary-color); padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; display: inline-block; margin-bottom: 8px; }
+    
+    .extra-details { 
+      max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; 
+      border-top: 0.5px solid rgba(255,255,255,0.1); margin-top: 0; padding-top: 0;
+      color: #b3b3b3; font-size: 13.5px;
     }
-
-    .secondary-btn {
-      background: transparent;
-      color: var(--primary-color);
-      border: 2px solid var(--primary-color);
-      box-shadow: none;
-      margin-top: 5px;
+    .info-card.expanded .extra-details { 
+      max-height: 1000px; margin-top: 12px; padding-top: 12px; transition: max-height 0.5s ease-in;
     }
+    .info-card .arrow-icon { transition: transform 0.3s; color: var(--text-muted); }
+    .info-card.expanded .arrow-icon { transform: rotate(180deg); color: var(--primary-color); }
 
-    .profile-card {
-      background: #ffffff;
-      border-radius: 15px;
-      padding: 20px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-      margin-bottom: 25px;
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      border: 1px solid #e2e8f0;
-    }
+    /* Other Subpages Layout */
+    .page-section { padding: 90px 16px 20px; background: #000; height: 100%; box-sizing: border-box; overflow-y: auto; }
+    
+    /* ⚙️ 3-Dots Settings Menu */
+    .profile-header-actions { display: flex; justify-content: flex-end; position: relative; margin-bottom: -15px; z-index: 10; }
+    .profile-three-dots { font-size: 26px; cursor: pointer; color: var(--text-muted); padding: 5px 10px; }
+    .settings-dropdown { position: absolute; top: 40px; right: 0; background: #1c1c1e; border: 1px solid #2c2c2e; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.6); z-index: 100; width: 160px; overflow: hidden; }
+    .settings-item { padding: 14px 16px; font-size: 14px; cursor: pointer; color: #fff; font-weight: 500; text-align: left; display: flex; align-items: center; gap: 8px; border-bottom: 0.5px solid rgba(255,255,255,0.05); }
+    .settings-item.danger { color: #ff3b30; font-weight: 600; border-bottom: none; }
+    .settings-item:active { background: rgba(255, 255, 255, 0.08); }
 
-    .profile-avatar {
-      width: 70px;
-      height: 70px;
-      background: var(--primary-color);
-      color: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 28px;
-      font-weight: bold;
-      text-transform: uppercase;
-      box-shadow: 0 4px 8px rgba(79, 70, 229, 0.3);
-    }
+    /* 👤 PROFILE DASHBOARD STYLES */
+    .pro-card { background: var(--card-bg); padding: 24px 20px; text-align: center; border-radius: 20px; border: 0.5px solid rgba(255,255,255,0.05); margin-bottom: 16px; }
+    .pfp-container { width: 90px; height: 90px; border-radius: 50%; background: #333; margin: 0 auto 15px; position: relative; overflow: hidden; border: 2px solid var(--primary-color); }
+    .pfp-img { width: 100%; height: 100%; object-fit: cover; }
+    .pfp-upload-overlay { position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.6); font-size: 11px; padding: 4px 0; cursor: pointer; }
 
-    .profile-info { flex: 1; }
-    .profile-info h4 { margin: 0 0 5px 0; font-size: 18px; color: #1e1b4b; }
-    .profile-info p { margin: 2px 0; font-size: 13px; color: #64748b; }
+    .stat-dashboard-card { background: var(--card-bg); border-radius: 16px; padding: 16px; border: 0.5px solid rgba(255,255,255,0.05); margin-top: 12px; text-align: left; }
+    .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 0.5px solid rgba(255,255,255,0.05); }
+    .stat-row:last-child { border-bottom: none; }
+    .stat-label { font-size: 14px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+    .stat-val { font-size: 15px; font-weight: 700; color: #fff; }
 
-    .edit-profile-trigger {
-      background: #f1f5f9;
-      color: #475569;
-      padding: 8px 12px;
-      font-size: 13px;
-      border-radius: 8px;
-      width: auto;
-      margin: 0;
-      box-shadow: none;
-    }
-    .edit-profile-trigger:hover { background: #e2e8f0; color: #1e293b; }
+    /* 📝 Modern Sugar Log Form Upgrades */
+    .log-form-container { background: var(--card-bg); border-radius: 20px; padding: 20px; border: 0.5px solid rgba(255,255,255,0.08); margin-bottom: 20px; }
+    .form-title { font-size: 16px; font-weight: 700; color: var(--primary-color); margin-top: 0; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+    .modern-input-wrapper { position: relative; margin-bottom: 14px; }
+    .modern-input-wrapper .field-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 18px; color: var(--text-muted); }
+    .modern-input-wrapper input { padding-left: 45px; margin: 0; }
+    .time-label { font-size: 13px; color: var(--primary-color); font-weight: 600; display: block; margin-bottom: 6px; margin-left: 2px; }
 
-    .settings-box {
-      background: #f8fafc;
-      padding: 20px;
-      border-radius: 15px;
-      border: 1px solid #e2e8f0;
-      margin-top: 20px;
-      animation: fadeIn 0.3s ease-in-out;
-    }
+    .hidden { display: none !important; }
+    
+    .badge { padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; color: #000; display: inline-block; }
+    .doc-badge { background: rgba(0, 242, 254, 0.2); color: var(--primary-color); font-size: 11px; padding: 4px 8px; border: 1px solid var(--primary-color); }
+    .badge-good { background: var(--sugar-good); color: #000; }
+    .badge-bad { background: var(--sugar-bad); color: #fff; }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .logout-btn { background: #fee2e2; color: var(--danger-color); margin-top: 25px; box-shadow: none; }
-    .logout-btn:hover { background: var(--danger-color); color: white; }
-
-    .table-container { overflow-x: auto; margin-top: 25px; border-radius: 12px; border: 1px solid #e5e7eb; }
-    table { width: 100%; border-collapse: collapse; background: white; font-size: 15px; }
-    th, td { padding: 14px; text-align: center; border-bottom: 1px solid #e5e7eb; }
-    th { background: #f8fafc; color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 12px; }
-
-    .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 13px; font-weight: 600; }
-    .badge-normal { background: #d1fae5; color: #065f46; }
-    .badge-warning { background: #fef3c7; color: #92400e; }
-    .badge-danger { background: #fee2e2; color: #991b1b; }
-
-    .delete-btn { background: #fee2e2; color: var(--danger-color); padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; }
-    .delete-btn:hover { background: var(--danger-color); color: white; }
-    .hidden { display: none; }
+    .table-container { overflow-x: auto; margin-top: 15px; border-radius: 12px; border: 0.5px solid rgba(255,255,255,0.08); }
+    table { width: 100%; border-collapse: collapse; background: var(--card-bg); font-size: 13px; text-align: center; }
+    th, td { padding: 14px 10px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+    th { background: rgba(255,255,255,0.02); color: var(--primary-color); font-weight: 600; }
   </style>
 </head>
-<body>
-  <div class="container">
+<body onclick="closeDropdowns(event)">
+
+  <div class="app-container">
     
-    <div id="auth-section">
-      <h2 id="auth-title">Log In</h2>
-      <div class="input-group">
-        <input type="text" id="reg-fullname" class="hidden" placeholder="Full Name (ሙሉ ስም)" />
-        <input type="text" id="username" placeholder="Username (የመለያ ስም)" />
-        
-        <div class="password-wrapper">
-          <input type="password" id="password" placeholder="Password (የምስጢር ቁጥር)" />
-          <span class="toggle-password" onclick="togglePasswordVisibility('password', this)">👁️</span>
-        </div>
-      </div>
-      <button id="main-auth-btn" onclick="login()">Log In</button>
-      <button class="secondary-btn" id="toggle-auth-btn" onclick="toggleAuthMode()">Create an Account</button>
+    <div class="app-header" id="app-header-bar">
+      <h1 class="app-title" id="main-header-title">Sugar Log & Info</h1>
     </div>
 
-    <div id="tracker-section" class="hidden">
-      <h1>Blood Sugar Tracker</h1>
+    <div class="app-content" id="app-main-content">
       
-      <div class="profile-card">
-        <div class="profile-avatar" id="user-avatar">-</div>
-        <div class="profile-info">
-          <h4 id="user-fullname-display">Loading Name...</h4>
-          <p>Username: <strong id="user-username-display">@username</strong></p>
-          <p>Total Records: <strong id="user-total-records">0</strong></p>
-          <p>Joined: <span id="user-joined-date">Today</span></p>
-        </div>
-        <button class="edit-profile-trigger" onclick="toggleEditProfile()">Edit Profile ⚙️</button>
-      </div>
-
-      <div id="edit-profile-box" class="settings-box hidden">
-        <h3>Edit Profile 📝</h3>
+      <!-- 🔐 SECURE LOGIN/SIGNUP SECTION -->
+      <div id="auth-section" class="auth-box">
+        <h2 style="font-size:26px; font-weight:800; margin-bottom:10px; color:var(--primary-color);">Sugar Log Portal</h2>
+        <p style="color:var(--text-muted); font-size:14px; margin-bottom:25px;">Secure Blood Sugar Tracking & Education</p>
         <div class="input-group">
-          <label style="font-size: 13px; font-weight: 600; color: #475569;">Update Full Name</label>
-          <input type="text" id="edit-fullname" placeholder="Full Name" />
+          <input type="text" id="reg-fullname" class="hidden" placeholder="Full Name" />
+          <input type="text" id="username" placeholder="Username" />
           
-          <label style="font-size: 13px; font-weight: 600; color: #475569; margin-top: 8px; display:block;">Update Username</label>
-          <input type="text" id="edit-username" placeholder="Username" />
-          
-          <label style="font-size: 13px; font-weight: 600; color: #475569; margin-top: 8px; display:block;">Change Password</label>
-          <div class="password-wrapper">
-            <input type="password" id="edit-password" placeholder="Leave blank to keep current" />
-            <span class="toggle-password" onclick="togglePasswordVisibility('edit-password', this)">👁️</span>
+          <div class="pass-container">
+            <input type="password" id="password" placeholder="Password" />
+            <span class="pass-toggle" onclick="togglePasswordVisibility()">👁️</span>
           </div>
         </div>
-        <button id="save-profile-btn" style="background:#4b5563;" onclick="updateProfileSettings()">Save Changes</button>
-        <button class="secondary-btn" style="border-color:#94a3b8; color:#64748b;" onclick="toggleEditProfile()">Cancel</button>
-      </div>
-      
-      <div class="input-group" style="margin-top:20px;">
-        <input type="number" id="sugar" placeholder="Enter blood sugar level (mg/dL)" min="10" max="600" />
-        <input type="text" id="note" placeholder="Note (e.g. fasting, after meal)" />
-      </div>
-      <button id="add-record-btn" onclick="addRecord()">Add New Record</button>
-
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Level</th>
-              <th>Note</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="records"></tbody>
-        </table>
+        <button id="main-auth-btn" onclick="handleAuth()">Log In</button>
+        <button class="secondary-btn" id="toggle-auth-btn" onclick="toggleAuthMode()">Create Account</button>
       </div>
 
-      <button class="logout-btn" onclick="logout()">Log Out / Account Exit</button>
+      <!-- 📚 TAB 1: HOME PAGE (EDUCATIONAL EXPANDABLE PORTAL) -->
+      <div id="home-tab-content" class="info-container hidden">
+        <p style="text-align: center; font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">👇 ካርዶቹን በመንካት ዝርዝር መረጃዎችንና መፍትሄዎችን ይመልከቱ</p>
+        
+        <div class="info-card" onclick="toggleCard(this)">
+          <span class="info-badge">ስለ ስኳር በሽታ (About Diabetes)</span>
+          <h3><span>🧬 የስኳር በሽታ ምንድን ነው?</span> <span class="arrow-icon">▼</span></h3>
+          <p>የስኳር በሽታ (Diabetes) ሰውነታችን የሚወስደውን ምግብ ወደ ኃይል ለመቀየር የሚያስችለውን የኢንሱሊን ሆርሞን ማምረት ሲያቅተው የሚከሰት የጤና እክል ነው።</p>
+          <div class="extra-details">
+            <strong style="color:var(--primary-color);">📌 ተጨማሪ ዝርዝር መረጃ፡</strong><br>
+            ኢንሱሊን በቆሽት የሚመረት ሆርሞን ሲሆን፣ በደማችን ውስጥ ያለው ስኳር ወደ ሴሎቻችን ገብቶ ኃይል እንዲሆን በሩን የመክፈት ኃላፊነት አለበት። ኢንሱሊን ከሌለ ስኳሩ በደም ውስጥ ይከማችና የደም ሥሮችን፣ ልብን፣ ኩላሊትንና አይንን ይጎዳል።
+          </div>
+        </div>
+
+        <div class="info-card" onclick="toggleCard(this)">
+          <span class="info-badge">ዓይነቶች (Types)</span>
+          <h3><span>📊 ዋና ዋና የስኳር በሽታ ዓይነቶች</span> <span class="arrow-icon">▼</span></h3>
+          <p>ዓይነት 1 (ኢንሱሊን ማምረት ማቆም) እና ዓይነት 2 (ኢንሱሊን በአግባቡ አለመጠቀም) በመባል በሁለት ይከፈላል።</p>
+          <div class="extra-details">
+            <strong style="color:var(--primary-color);">📌 ዓይነት 1 ስኳር (Type 1):</strong> ሰውነት ኢንሱሊን ማምረት ሲያቆም ነው። በየቀኑ ኢንሱሊን መውሰድ ግዴታ ነው።<br><br>
+            <strong style="color:var(--primary-color);">📌 ዓይነት 2 ስኳር (Type 2):</strong> በጣም የተለመደው ነው። ሰውነት ኢንሱሊን በአግባቡ መጠቀም ሲያቅተው ነው። በስፖርት እና አመጋገብ መከላከል ይቻላል።
+          </div>
+        </div>
+
+        <div class="info-card" onclick="toggleCard(this)">
+          <span class="info-badge">ምልክቶች (Symptoms)</span>
+          <h3><span>🚨 ሊታወቁ የሚገቡ ዋና ዋና ምልክቶች</span> <span class="arrow-icon">▼</span></h3>
+          <p>በተደጋጋሚ መሽናት፣ ከፍተኛ የውሃ ጥም መኖር፣ ያለምክንያት ክብደት መቀነስ እና ቶሎ ቶሎ መልፈስፈስ።</p>
+          <div class="extra-details">
+            <strong style="color:var(--primary-color);">⚠️ ሌሎች ምልክቶች፡</strong><br>
+            • የዕይታ ብዥታ (Blurry Vision)<br>
+            • የእጅ ወይም የእግር መደንዘዝ ስሜት<br>
+            • ትናንሽ ቁስሎች ቶሎ የመዳን ፍጥነት መቀነስ
+          </div>
+        </div>
+
+        <div class="info-card" onclick="toggleCard(this)">
+          <span class="info-badge">የስኳር መጠን መለኪያ (Standard Levels)</span>
+          <h3><span>🩸 መደበኛ የስኳር መጠን ስንት ነው?</span> <span class="arrow-icon">▼</span></h3>
+          <p>በፆም (Fasting) ከ70-100 mg/dL ጥሩ ሲሆን፣ ከምግብ በኋላ ደግሞ ከ140 mg/dL በታች መሆን አለበት።</p>
+          <div class="extra-details">
+            <strong style="color:var(--primary-color);">📈 ሙሉ የምዘና ሰንጠረዥ፦</strong><br>
+            • ፆም ላይ 70-100 መደበኛ / 101-125 ቅድመ ስኳር / 126+ የስኳር በሽታ。<br>
+            • ከምግብ በኋላ ከ140 በታች መደበኛ / 140-199 ቅድመ ስኳር / 200+ የስኳር በሽታ።
+          </div>
+        </div>
+      </div>
+
+      <!-- 📊 TAB 2: RECORDS LOGGING -->
+      <div id="records-tab-content" class="page-section hidden">
+        <div id="patient-input-area" class="log-form-container">
+          <h3 class="form-title"><span>🩸</span> አዲስ የስኳር መጠን መመዝገቢያ (New Log)</h3>
+          
+          <div class="modern-input-wrapper">
+            <span class="field-icon">📊</span>
+            <input type="number" id="sugar" placeholder="የስኳር መጠን ያስገቡ (mg/dL)" />
+          </div>
+          
+          <div style="margin-bottom: 14px; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+            <label class="time-label">🕒 የተለካበት ሰዓት (Time Recorded) *ግዴታ</label>
+            <input type="time" id="sugar-time" style="margin: 0;" />
+          </div>
+          
+          <div class="modern-input-wrapper">
+            <span class="field-icon">📝</span>
+            <input type="text" id="note" placeholder="ማስታወሻ (ምሳሌ፡ በፆም፣ ከምሳ በኋላ...)" />
+          </div>
+          
+          <button onclick="addRecord()" style="margin-bottom: 0; background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%); color: #000;">🔒 መረጃውን መዝግብ (Save Record)</button>
+        </div>
+
+        <h3 id="records-list-title" style="margin-top: 20px; font-size: 16px; font-weight: 700; padding-left: 4px;">የተመዘገቡ የጤና መረጃዎች</h3>
+        <div class="table-container">
+          <table>
+            <thead><tr id="table-header-row"><th>ቀን እና ሰዓት</th><th>መጠን</th><th>ሁኔታ</th><th>ማስታወሻ</th></tr></thead>
+            <tbody id="records"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 👤 TAB 3: ME PROFILE -->
+      <div id="me-tab-content" class="page-section hidden">
+        
+        <div class="profile-header-actions">
+          <div class="profile-three-dots" onclick="toggleSettingsDropdown(event)">⋮</div>
+          <div class="settings-dropdown hidden" id="my-settings-menu">
+            <div class="settings-item" onclick="logout()">👋 Log Out</div>
+            <div class="settings-item danger" onclick="deleteAccount()">🗑️ Delete Account</div>
+          </div>
+        </div>
+
+        <div class="pro-card">
+          <div class="pfp-container">
+            <img id="my-pfp-display" class="pfp-img" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" />
+            <label class="pfp-upload-overlay">Edit<input type="file" accept="image/*" style="display:none;" onchange="uploadProfilePic(this)" /></label>
+          </div>
+          <h2 id="user-fullname-display" style="margin:5px 0; font-size:18px;">Loading...</h2>
+          <p id="user-username-display" style="color:var(--text-muted); margin:0; font-size:13px;">@username</p>
+          <div style="margin-top:12px;">
+            <span id="user-role-display" class="badge doc-badge">Patient</span>
+          </div>
+        </div>
+
+        <div class="stat-dashboard-card" id="patient-stats-card">
+          <h3 style="margin-top:0; font-size:15px; color:var(--primary-color); border-bottom:0.5px solid rgba(255,255,255,0.1); padding-bottom:8px; margin-bottom:5px;">📋 የጤና መረጃ ማጠቃለያ (Logs Summary)</h3>
+          
+          <div class="stat-row">
+            <span class="stat-label">🔢 አጠቃላይ የምዝገባ ብዛት (Total Records):</span>
+            <span class="stat-val" id="dash-total-logs">0</span>
+          </div>
+          
+          <div class="stat-row">
+            <span class="stat-label">🩸 የመጨረሻ የስኳር መጠን (Last Level):</span>
+            <span class="stat-val" id="dash-last-level">-- mg/dL</span>
+          </div>
+
+          <div class="stat-row">
+            <span class="stat-label">🕒 የተመዘገበበት ሰዓት (Last Recorded Time):</span>
+            <span class="stat-val" id="dash-last-time">-- : --</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- 📱 BOTTOM NAVIGATION BAR -->
+    <div class="bottom-nav hidden" id="app-bottom-nav">
+      <button id="nav-home" class="nav-item active" onclick="switchTab('home')"><span class="icon">🏠</span><span>Home</span></button>
+      <button id="nav-records" class="nav-item" onclick="switchTab('records')"><span class="icon">📊</span><span>Sugar Log</span></button>
+      <button id="nav-me" class="nav-item" onclick="switchTab('me')"><span class="icon">👤</span><span>Me</span></button>
     </div>
 
   </div>
 
   <script>
     const DATABASE_URL = "https://yddj-13184-default-rtdb.firebaseio.com/"; 
-
     let currentUserKey = localStorage.getItem("currentSugarUserKey") || null;
+    let cachedUserData = null;
     let isLoginMode = true;
 
-    // 🌟 አሁን በትክክል እዚህ ጋር ተቀምጧል!
-    function togglePasswordVisibility(inputId, iconElement) {
-      const passwordInput = document.getElementById(inputId);
-      if (passwordInput.type === "password") {
-        passwordInput.type = "text";
-        iconElement.innerText = "🙈";
-      } else {
-        passwordInput.type = "password";
-        iconElement.innerText = "👁️";
+    function toggleCard(cardElement) { cardElement.classList.toggle("expanded"); }
+    function toggleSettingsDropdown(e) { e.stopPropagation(); document.getElementById("my-settings-menu").classList.toggle("hidden"); }
+    function closeDropdowns(e) { const menu = document.getElementById("my-settings-menu"); if(menu && !menu.classList.contains("hidden")) { menu.classList.add("hidden"); } }
+
+    function togglePasswordVisibility() {
+      const passInput = document.getElementById("password");
+      const toggleBtn = document.querySelector(".pass-toggle");
+      if (passInput && passInput.type === "password") {
+        passInput.type = "text"; toggleBtn.innerText = "🙈";
+      } else if(passInput) {
+        passInput.type = "password"; toggleBtn.innerText = "👁️";
       }
     }
 
-    function hashPassword(password) {
-      let hash = 0;
-      for (let i = 0; i < password.length; i++) {
-        const char = password.charCodeAt(i);
-        hash = (hash << 5) - hash + char;
-        hash = hash & hash; 
-      }
-      return hash.toString(16);
+    // 🔒 ጃቫስክሪፕት አብሮ የተሰራውን የዌብ ክሪፕቶ በመጠቀም SHA-256 Hash ማድረጊያ (አዲስ የተጨመረ)
+    async function hashPassword(string) {
+      const utf8 = new TextEncoder().encode(string);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', utf8);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map(bytes => bytes.toString(16).padStart(2, '0')).join('');
+      return hashHex;
     }
 
-    if (currentUserKey) { showTracker(); }
-
-    function toggleAuthMode() {
-      isLoginMode = !isLoginMode;
-      const title = document.getElementById("auth-title");
-      const mainBtn = document.getElementById("main-auth-btn");
-      const toggleBtn = document.getElementById("toggle-auth-btn");
-      const fullNameField = document.getElementById("reg-fullname");
-      
-      document.getElementById("username").value = "";
-      document.getElementById("password").value = "";
-      fullNameField.value = "";
-
-      if (isLoginMode) {
-        title.innerText = "Log In"; mainBtn.innerText = "Log In"; toggleBtn.innerText = "Create an Account";
-        fullNameField.classList.add("hidden");
-      } else {
-        title.innerText = "Create Account"; mainBtn.innerText = "Register & Log In"; toggleBtn.innerText = "Already have an account? Log In";
-        fullNameField.classList.remove("hidden");
-      }
-    }
-
-    function toggleEditProfile() {
-      const box = document.getElementById("edit-profile-box");
-      box.classList.toggle("hidden");
+    function formatTo12Hour(timeStr) {
+      if (!timeStr) return '--:--';
+      const parts = timeStr.split(':');
+      let hours = parseInt(parts[0]);
+      const minutes = parts[1];
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12;
+      hours = hours ? hours : 12; 
+      return `${hours}:${minutes} ${ampm}`;
     }
 
     async function firebaseRequest(path, method = "GET", data = null) {
       const options = { method, headers: { "Content-Type": "application/json" } };
       if (data) options.body = JSON.stringify(data);
-      try {
-        const res = await fetch(`${DATABASE_URL}${path}.json`, options);
-        return res.json();
-      } catch (error) {
-        console.error("Database Error:", error);
-        alert("የዳታቤዝ ግንኙነት ስህተት ተፈጥሯል!");
-        return null;
+      const res = await fetch(`${DATABASE_URL}${path}.json`, options);
+      return res.json();
+    }
+
+    function switchTab(tabName) {
+      const views = ['home', 'records', 'me'];
+      views.forEach(v => {
+        document.getElementById(`${v}-tab-content`).classList.add("hidden");
+        if(document.getElementById(`nav-${v}`)) document.getElementById(`nav-${v}`).classList.remove("active");
+      });
+
+      document.getElementById(`${tabName}-tab-content`).classList.remove("hidden");
+      if(document.getElementById(`nav-${tabName}`)) document.getElementById(`nav-${tabName}`).classList.add("active");
+
+      const mainTitle = document.getElementById("main-header-title");
+      if (tabName === 'home') mainTitle.innerText = "Health Information Portal 📚";
+      else if (tabName === 'records') mainTitle.innerText = "Sugar Logs Tracker 📊";
+      else if (tabName === 'me') mainTitle.innerText = "My Profile 👤";
+
+      if (tabName === 'records') renderRecords();
+      else if (tabName === 'me') fetchProfileData();
+    }
+
+    function getStatusBadge(level, note) {
+      const val = parseInt(level);
+      if (isNaN(val)) return `<td><span class="badge">Unknown</span></td>`;
+      const cleanNote = note ? note.toLowerCase() : "";
+      const isFasting = cleanNote.includes("fasting") || cleanNote.includes("በፆም") || cleanNote.includes("ፆም");
+      if (isFasting) {
+        return (val >= 70 && val <= 100) ? `<td><span class="badge badge-good">😊 ጥሩ (Good Fasting)</span></td>` : `<td><span class="badge badge-bad">⚠️ መጥፎ (High/Low)</span></td>`;
+      } else {
+        return (val >= 70 && val <= 140) ? `<td><span class="badge badge-good">😊 ጥሩ (Good)</span></td>` : `<td><span class="badge badge-bad">⚠️ መጥፎ (High/Low)</span></td>`;
       }
     }
 
-    async function login() {
-      const userField = document.getElementById("username");
-      const passField = document.getElementById("password");
-      const fullNameField = document.getElementById("reg-fullname");
-      const mainBtn = document.getElementById("main-auth-btn");
-      
-      const user = userField.value.trim();
-      const pass = passField.value;
-      const fullname = fullNameField.value.trim();
+    async function renderRecords() {
+      const tbody = document.getElementById("records"); tbody.innerHTML = "";
+      const data = await firebaseRequest(`/users/${currentUserKey}/records`);
+      if(!data) return;
+      Object.keys(data).reverse().forEach(k => {
+        const rec = data[k];
+        tbody.innerHTML += `<tr><td>${rec.date} @ ${formatTo12Hour(rec.time)}</td><td><strong>${rec.level} mg/dL</strong></td>${getStatusBadge(rec.level, rec.note)}<td>${escapeHTML(rec.note)}</td></tr>`;
+      });
+    }
 
-      if (!user || !pass) return alert("Please fill in all fields");
-      if (pass.length < 4) return alert("Password must be at least 4 characters");
-      if (!isLoginMode && !fullname) return alert("Please enter your Full Name");
+    async function addRecord() {
+      const level = document.getElementById("sugar").value;
+      const time = document.getElementById("sugar-time").value;
+      const note = document.getElementById("note").value;
+      if(!level) return alert("⚠️ Sugar level ያስገቡ!");
+      if(!time) return alert("🛑 ግዴታ ነው፡ እባክዎ የስኳር መጠኑን የለኩበትን ሰዓት ያስገቡ!");
+      await firebaseRequest(`/users/${currentUserKey}/records`, "POST", { level: level, time: time, note: note, date: new Date().toLocaleDateString() });
+      document.getElementById("sugar").value = ""; document.getElementById("sugar-time").value = ""; document.getElementById("note").value = "";
+      renderRecords();
+    }
 
-      mainBtn.innerText = "Connecting... Please wait... ⏳";
-      mainBtn.disabled = true;
+    async function uploadProfilePic(input) {
+      const file = input.files[0]; if (!file) return;
+      if (file.size > 500 * 1024) return alert("Please upload profile image smaller than 500KB!");
+      const reader = new FileReader();
+      reader.onload = async function (e) {
+        document.getElementById("my-pfp-display").src = e.target.result;
+        await firebaseRequest(`/users/${currentUserKey}/pfp`, "PUT", e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
 
-      const hashedPassword = hashPassword(pass);
-      const allUsers = await firebaseRequest("/users");
+    function toggleAuthMode() {
+      isLoginMode = !isLoginMode;
+      document.getElementById("reg-fullname").classList.toggle("hidden", isLoginMode);
+      document.getElementById("main-auth-btn").innerText = isLoginMode ? "Log In" : "Register Account";
+      document.getElementById("toggle-auth-btn").innerText = isLoginMode ? "Create Account" : "Back to Log In";
+    }
 
-      if (isLoginMode) {
-        let foundUserKey = null;
-        if (allUsers) {
-          for (const key in allUsers) {
-            if (allUsers[key].username && allUsers[key].username.toLowerCase() === user.toLowerCase() && allUsers[key].password === hashedPassword) {
-              foundUserKey = key;
-              break;
-            }
-          }
-        }
+    async function handleAuth() {
+      const user = document.getElementById("username").value.trim();
+      const pass = document.getElementById("password").value;
+      const authBtn = document.getElementById("main-auth-btn");
 
-        mainBtn.innerText = "Log In";
-        mainBtn.disabled = false;
+      if (!user || !pass) return alert("⚠️ እባክዎ ሁሉንም ክፍት ቦታዎች ይሙሉ!");
+      if (!isLoginMode && pass.length < 4) return alert("⚠️ የይለፍ ቃል ርዝመት ቢያንስ 4 ሆሄያት መሆን አለበት!");
 
-        if (foundUserKey) {
-          userField.value = ""; passField.value = "";
-          currentUserKey = foundUserKey;
-          localStorage.setItem("currentSugarUserKey", currentUserKey);
-          showTracker();
-        } else { alert("Incorrect username or password!"); }
-      } else {
-        let usernameExists = false;
-        if (allUsers) {
-          for (const key in allUsers) {
-            if (allUsers[key].username && allUsers[key].username.toLowerCase() === user.toLowerCase()) {
-              usernameExists = true;
-              break;
-            }
-          }
-        }
+      authBtn.disabled = true;
+      authBtn.innerText = "Processing...";
 
-        if (usernameExists) { 
-          mainBtn.innerText = "Register & Log In"; mainBtn.disabled = false;
-          return alert("Username already taken! Choose another one."); 
-        }
+      try {
+        const allUsers = await firebaseRequest("/users") || {};
+        // 🔒 የገባውን ፓስወርድ ወዲያውኑ Hash ማድረግ
+        const hashedInputPassword = await hashPassword(pass);
         
-        const newUser = {
-          fullname: fullname,
-          username: user,
-          password: hashedPassword,
-          joinedDate: new Date().toLocaleDateString()
-        };
+        if (isLoginMode) {
+          // 🔑 LOGIN LOGIC (በታሸገ/በተደበቀ ፓስወርድ ማመሳከር)
+          let foundKey = null; let passwordCorrect = false;
+          for(let k in allUsers) { 
+            if(allUsers[k].username?.toLowerCase() === user.toLowerCase()) { 
+              foundKey = k; 
+              // እዚህ ጋር ከዳታቤዙ ጋር የምናመሳክረው የታሸገውን ፓስወርድ ነው
+              if(allUsers[k].password === hashedInputPassword) passwordCorrect = true; 
+              break; 
+            } 
+          }
+          if(foundKey && passwordCorrect) { currentUserKey = foundKey; localStorage.setItem("currentSugarUserKey", foundKey); showTracker(); } 
+          else if (foundKey && !passwordCorrect) { alert("❌ ትክክለኛ ያልሆነ የይለፍ ቃል!"); } 
+          else { alert("❌ ይህ መለያ ስም (Username) አልተገኘም!"); }
+        } else {
+          // 📝 REGISTER LOGIC
+          let usernameExists = false;
+          for(let k in allUsers) {
+            if(allUsers[k].username?.toLowerCase() === user.toLowerCase()) { usernameExists = true; break; }
+          }
+          
+          if(usernameExists) {
+            alert("❌ ይህ መለያ ስም (Username) ቀድሞ ተይዟል! እባክዎ ሌላ ይሞክሩ።");
+            authBtn.disabled = false;
+            authBtn.innerText = "Register Account";
+            return;
+          }
 
-        const res = await firebaseRequest("/users", "POST", newUser);
-        mainBtn.innerText = "Register & Log In"; mainBtn.disabled = false;
-
-        if(res && res.name) {
-          userField.value = ""; passField.value = ""; fullNameField.value = "";
-          alert("🎉 Account Created Successfully!");
-          currentUserKey = res.name;
-          localStorage.setItem("currentSugarUserKey", currentUserKey);
-          showTracker();
+          // 🔒 አዲስ አካውንት ሲፈጠር የተደበቀውን (Hashed) ፓስወርድ ዳታቤዝ ላይ መጫን
+          const res = await firebaseRequest("/users", "POST", { fullname: document.getElementById("reg-fullname").value || "Anonymous", username: user, password: hashedInputPassword, role: "patient", pfp: "" });
+          if(res) { currentUserKey = res.name; localStorage.setItem("currentSugarUserKey", res.name); showTracker(); }
         }
+      } catch (err) {
+        alert("An error occurred. Please check network connection.");
+      } finally {
+        authBtn.disabled = false;
+        authBtn.innerText = isLoginMode ? "Log In" : "Register Account";
       }
     }
 
     async function showTracker() {
       document.getElementById("auth-section").classList.add("hidden");
-      document.getElementById("tracker-section").classList.remove("hidden");
-      
-      const userData = await firebaseRequest(`/users/${currentUserKey}`);
-      if(userData) {
-        document.getElementById("user-fullname-display").innerText = userData.fullname || "User";
-        document.getElementById("user-username-display").innerText = "@" + (userData.username || "username");
-        document.getElementById("user-avatar").innerText = (userData.fullname || "U").charAt(0);
-        document.getElementById("user-joined-date").innerText = userData.joinedDate || "N/A";
+      document.getElementById("app-bottom-nav").classList.remove("hidden");
+      cachedUserData = await firebaseRequest(`/users/${currentUserKey}`);
+      switchTab('home');
+    }
+
+    async function fetchProfileData() {
+      cachedUserData = await firebaseRequest(`/users/${currentUserKey}`);
+      if(cachedUserData) {
+        document.getElementById("user-fullname-display").innerText = cachedUserData.fullname;
+        document.getElementById("user-username-display").innerText = "@" + cachedUserData.username;
+        document.getElementById("user-role-display").innerText = "Patient";
+        if(cachedUserData.pfp) document.getElementById("my-pfp-display").src = cachedUserData.pfp;
+
+        document.getElementById("patient-stats-card").classList.remove("hidden");
+        const recs = cachedUserData.records || {};
+        const recKeys = Object.keys(recs);
+        const totalLogs = recKeys.length;
+        document.getElementById("dash-total-logs").innerText = totalLogs;
         
-        document.getElementById("edit-fullname").value = userData.fullname || "";
-        document.getElementById("edit-username").value = userData.username || "";
-      }
-      render();
-    }
-
-    async function updateProfileSettings() {
-      const editFullname = document.getElementById("edit-fullname").value.trim();
-      const editUsername = document.getElementById("edit-username").value.trim();
-      const editPassword = document.getElementById("edit-password").value;
-      const saveBtn = document.getElementById("save-profile-btn");
-
-      if(!editFullname || !editUsername) return alert("Full Name and Username cannot be empty!");
-
-      saveBtn.innerText = "Saving Profile... ⏳"; saveBtn.disabled = true;
-
-      const userData = await firebaseRequest(`/users/${currentUserKey}`);
-      if(userData) {
-        userData.fullname = editFullname;
-        userData.username = editUsername;
-        if(editPassword) {
-          if(editPassword.length < 4) {
-            saveBtn.innerText = "Save Changes"; saveBtn.disabled = false;
-            return alert("New password must be at least 4 characters!");
-          }
-          userData.password = hashPassword(editPassword);
-        }
-
-        const res = await firebaseRequest(`/users/${currentUserKey}`, "PATCH", userData);
-        if(res) {
-          alert("⚙️ Profile Updated Successfully!");
-          document.getElementById("edit-password").value = "";
-          toggleEditProfile();
-          showTracker();
+        if(totalLogs > 0) {
+          const lastRecKey = recKeys[recKeys.length - 1];
+          const lastRec = recs[lastRecKey];
+          document.getElementById("dash-last-level").innerText = `${lastRec.level} mg/dL`;
+          document.getElementById("dash-last-time").innerText = `${lastRec.date} @ ${formatTo12Hour(lastRec.time)}`;
+        } else {
+          document.getElementById("dash-last-level").innerText = "-- mg/dL";
+          document.getElementById("dash-last-time").innerText = "-- : --";
         }
       }
-      saveBtn.innerText = "Save Changes"; saveBtn.disabled = false;
     }
 
-    function logout() {
-      currentUserKey = null;
-      localStorage.removeItem("currentSugarUserKey");
-      document.getElementById("edit-profile-box").classList.add("hidden");
-      document.getElementById("auth-section").classList.remove("hidden");
-      document.getElementById("tracker-section").classList.add("hidden");
-    }
+    function logout() { localStorage.removeItem("currentSugarUserKey"); location.reload(); }
 
-    function getSugarBadge(level) {
-      const num = parseInt(level);
-      if (num < 70) return `<span class="badge badge-danger">${num} mg/dL (Low)</span>`;
-      if (num <= 140) return `<span class="badge badge-normal">${num} mg/dL (Normal)</span>`;
-      if (num <= 199) return `<span class="badge badge-warning">${num} mg/dL (High)</span>`;
-      return `<span class="badge badge-danger">${num} mg/dL (Very High)</span>`;
-    }
-
-    function escapeHTML(str) {
-      if(!str) return '';
-      return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
-    }
-
-    async function render() {
-      const table = document.getElementById("records");
-      table.innerHTML = `<tr><td colspan="4" style="color: #9ca3af; padding: 20px;">Loading records from Cloud...</td></tr>`;
-
-      const data = await firebaseRequest(`/users/${currentUserKey}/records`);
-      table.innerHTML = "";
-
-      if (!data) {
-        table.innerHTML = `<tr><td colspan="4" style="color: #9ca3af; padding: 20px;">No records found. Start tracking!</td></tr>`;
-        document.getElementById("user-total-records").innerText = "0";
-        return;
-      }
-
-      const recordKeys = Object.keys(data);
-      document.getElementById("user-total-records").innerText = recordKeys.length;
-
-      recordKeys.reverse().forEach(key => {
-        const item = data[key];
-        table.innerHTML += `
-          <tr>
-            <td style="color: #4b5563; font-size: 14px;">${item.date}</td>
-            <td>${getSugarBadge(item.level)}</td>
-            <td style="color: #4b5563;">${escapeHTML(item.note) || '-'}</td>
-            <td><button class="delete-btn" onclick="deleteRecord('${key}')">Delete</button></td>
-          </tr>
-        `;
-      });
-    }
-
-    async function addRecord() {
-      const levelInput = document.getElementById("sugar");
-      const noteInput = document.getElementById("note");
-      const addBtn = document.getElementById("add-record-btn");
-      const level = levelInput.value;
-      const note = noteInput.value.trim();
-
-      if (!level) return alert("Please enter blood sugar level");
-      if (parseInt(level) < 10 || parseInt(level) > 600) return alert("Please enter a realistic level (10 - 600)");
-
-      addBtn.innerText = "Saving... ⏳"; addBtn.disabled = true;
-
-      const record = {
-        date: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-        level: parseInt(level),
-        note: note
-      };
-
-      await firebaseRequest(`/users/${currentUserKey}/records`, "POST", record);
-      addBtn.innerText = "Add New Record"; addBtn.disabled = false;
-      levelInput.value = ""; noteInput.value = "";
-      render();
-    }
-
-    async function deleteRecord(key) {
-      if(confirm("Are you sure you want to delete this record from Cloud?")) {
-        await firebaseRequest(`/users/${currentUserKey}/records/${key}`, "DELETE");
-        render();
+    async function deleteAccount() {
+      const confirmDelete = confirm("⚠️ ማስጠንቀቂያ፦ አካውንትዎን ሙሉ በሙሉ ለማጥፋት እርግጠኛ ነዎት? ይህ ድርጊት ወደ ኋላ አይመለስም!");
+      if(confirmDelete) {
+        await firebaseRequest(`/users/${currentUserKey}`, "DELETE");
+        alert("✅ አካውንትዎ በተሳካ ሁኔታ ጠፍቷል።");
+        logout();
       }
     }
+
+    if (currentUserKey) { showTracker(); }
+    function escapeHTML(s) { return s ? s.replace(/[&<>'"]/g, '') : ''; }
   </script>
 </body>
 </html>
