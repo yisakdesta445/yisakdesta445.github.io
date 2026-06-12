@@ -1,590 +1,393 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="am">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Sugar Log & Dashboard Portal</title>
-  <style>
-    :root {
-      --primary-color: #00f2fe; 
-      --accent-color: #fe2c55;   
-      --dark-bg: #000000;
-      --card-bg: #16161e;
-      --input-bg: #1f1f2e;
-      --text-muted: #86868b;
-      --sugar-good: #4cd964; 
-      --sugar-bad: #ff3b30;  
-    }
-
-    html, body {
-      margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #000; display: flex; justify-content: center; align-items: center; color: #fff;
-    }
-
-    .app-container {
-      width: 100%; max-width: 500px; height: 100%; background: #000;
-      display: flex; flex-direction: column; position: relative; box-shadow: 0 25px 50px rgba(0,0,0,0.8);
-    }
-
-    @media (min-width: 500px) {
-      .app-container { height: 88vh; border-radius: 30px; overflow: hidden; border: 1px solid #222; }
-    }
-
-    /* 📌 Top Header Bar */
-    .app-header {
-      padding: 16px; background: rgba(22, 22, 30, 0.95);
-      position: absolute; top: 0; width: 100%; z-index: 20; box-sizing: border-box;
-      border-bottom: 0.5px solid rgba(255, 255, 255, 0.1);
-      display: flex; justify-content: space-between; align-items: center;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Glassmorphism TV PDF Reader</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    .app-title { font-size: 18px; font-weight: 800; color: var(--primary-color); margin: 0; }
+    <style>
+        :root {
+            --bg-color: #0b0c10;
+            --card-bg: rgba(31, 40, 51, 0.8); /* ለመስታወት ውጤት ግልጽነት ያለው ከለር */
+            --primary-glow: #66fcf1;
+            --text-color: #c5c6c7;
+        }
 
-    .app-content { flex: 1; overflow: hidden; position: relative; background: #000; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    /* 📱 Bottom Nav Bar */
-    .bottom-nav {
-      height: 60px; background: #16161e; border-top: 0.5px solid rgba(255, 255, 255, 0.1);
-      display: flex; justify-content: space-around; align-items: center; z-index: 20; position: relative;
-    }
-    .nav-item {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      background: none; border: none; color: rgba(255, 255, 255, 0.6);
-      cursor: pointer; font-size: 11px; font-weight: 500; width: 33.33%; height: 100%; gap: 3px;
-    }
-    .nav-item .icon { font-size: 20px; }
-    .nav-item.active { color: var(--primary-color); font-weight: 700; }
+        body {
+            background-color: var(--bg-color);
+            color: #ffffff;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
 
-    /* Auth Box */
-    .auth-box { padding: 120px 30px 30px; text-align: center; background: #000; height: 100%; box-sizing: border-box; z-index: 25; position: absolute; top:0; left:0; width:100%; overflow-y: auto; }
-    .pass-container { position: relative; width: 100%; }
-    .pass-toggle { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-muted); z-index: 10; user-select: none; }
-    input, textarea, select {
-      padding: 16px; margin: 10px 0; width: 100%; font-size: 15px; border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; box-sizing: border-box; background: var(--input-bg); color: #fff; outline: none;
-    }
-    input:focus, select:focus, textarea:focus { border-color: var(--primary-color); }
-    button {
-      padding: 16px; margin: 12px 0; width: 100%; font-size: 16px; font-weight: 700; background: var(--primary-color); color: black; border: none; border-radius: 14px; cursor: pointer;
-    }
-    button:disabled { background: var(--text-muted); cursor: not-allowed; }
-    .secondary-btn { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+        /* የማስተዋወቂያ ስክሪን (Splash Screen) */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, #1f2833 0%, #0b0c10 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out, visibility 0.5s;
+        }
 
-    /* 📚 HOME PAGE: EXPANDABLE PORTAL STYLES */
-    .info-container { padding: 90px 16px 20px; height: 100%; box-sizing: border-box; overflow-y: auto; }
-    .info-card { 
-      background: var(--card-bg); border-radius: 16px; padding: 16px; margin-bottom: 14px; 
-      border: 0.5px solid rgba(255,255,255,0.05); cursor: pointer; transition: all 0.3s ease;
-      position: relative;
-    }
-    .info-card:active { transform: scale(0.98); background: #1f1f2e; }
-    .info-card h3 { margin-top: 0; color: var(--primary-color); font-size: 16px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-    .info-card p { font-size: 14px; color: #e5e5e5; line-height: 1.6; margin-bottom: 0; }
-    .info-badge { background: rgba(0, 242, 254, 0.1); color: var(--primary-color); padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; display: inline-block; margin-bottom: 8px; }
-    
-    .extra-details { 
-      max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; 
-      border-top: 0.5px solid rgba(255,255,255,0.1); margin-top: 0; padding-top: 0;
-      color: #b3b3b3; font-size: 13.5px;
-    }
-    .info-card.expanded .extra-details { 
-      max-height: 1000px; margin-top: 12px; padding-top: 12px; transition: max-height 0.5s ease-in;
-    }
-    .info-card .arrow-icon { transition: transform 0.3s; color: var(--text-muted); }
-    .info-card.expanded .arrow-icon { transform: rotate(180deg); color: var(--primary-color); }
+        .splash-logo {
+            font-size: 80px;
+            color: var(--primary-glow);
+            text-shadow: 0 0 20px var(--primary-glow);
+            margin-bottom: 20px;
+        }
 
-    /* Other Subpages Layout */
-    .page-section { padding: 90px 16px 20px; background: #000; height: 100%; box-sizing: border-box; overflow-y: auto; }
-    
-    /* ⚙️ 3-Dots Settings Menu */
-    .profile-header-actions { display: flex; justify-content: flex-end; position: relative; margin-bottom: -15px; z-index: 10; }
-    .profile-three-dots { font-size: 26px; cursor: pointer; color: var(--text-muted); padding: 5px 10px; }
-    .settings-dropdown { position: absolute; top: 40px; right: 0; background: #1c1c1e; border: 1px solid #2c2c2e; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.6); z-index: 100; width: 160px; overflow: hidden; }
-    .settings-item { padding: 14px 16px; font-size: 14px; cursor: pointer; color: #fff; font-weight: 500; text-align: left; display: flex; align-items: center; gap: 8px; border-bottom: 0.5px solid rgba(255,255,255,0.05); }
-    .settings-item.danger { color: #ff3b30; font-weight: 600; border-bottom: none; }
-    .settings-item:active { background: rgba(255, 255, 255, 0.08); }
+        /* የፋይል መምረጫ ስክሪን */
+        #file-selector-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100%;
+        }
 
-    /* 👤 PROFILE DASHBOARD STYLES */
-    .pro-card { background: var(--card-bg); padding: 24px 20px; text-align: center; border-radius: 20px; border: 0.5px solid rgba(255,255,255,0.05); margin-bottom: 16px; }
-    .pfp-container { width: 90px; height: 90px; border-radius: 50%; background: #333; margin: 0 auto 15px; position: relative; overflow: hidden; border: 2px solid var(--primary-color); }
-    .pfp-img { width: 100%; height: 100%; object-fit: cover; }
-    .pfp-upload-overlay { position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.6); font-size: 11px; padding: 4px 0; cursor: pointer; }
+        .upload-card {
+            background-color: #1f2833;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 2px dashed var(--primary-glow);
+            max-width: 500px;
+            width: 90%;
+        }
 
-    .stat-dashboard-card { background: var(--card-bg); border-radius: 16px; padding: 16px; border: 0.5px solid rgba(255,255,255,0.05); margin-top: 12px; text-align: left; }
-    .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 0.5px solid rgba(255,255,255,0.05); }
-    .stat-row:last-child { border-bottom: none; }
-    .stat-label { font-size: 14px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
-    .stat-val { font-size: 15px; font-weight: 700; color: #fff; }
+        #file-input {
+            display: none;
+        }
 
-    /* 📝 Modern Sugar Log Form Upgrades */
-    .log-form-container { background: var(--card-bg); border-radius: 20px; padding: 20px; border: 0.5px solid rgba(255,255,255,0.08); margin-bottom: 20px; }
-    .form-title { font-size: 16px; font-weight: 700; color: var(--primary-color); margin-top: 0; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
-    .modern-input-wrapper { position: relative; margin-bottom: 14px; }
-    .modern-input-wrapper .field-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 18px; color: var(--text-muted); }
-    .modern-input-wrapper input, .modern-input-wrapper textarea { padding-left: 45px; margin: 0; }
-    .time-label { font-size: 13px; color: var(--primary-color); font-weight: 600; display: block; margin-bottom: 6px; margin-left: 2px; }
+        /* ዋናው የንባብ ገጽ */
+        #main-viewer {
+            display: none;
+            flex-direction: column;
+            height: 100vh;
+            width: 100%;
+            position: relative;
+        }
 
-    .hidden { display: none !important; }
-    
-    .badge { padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; color: #000; display: inline-block; }
-    .doc-badge { background: rgba(0, 242, 254, 0.2); color: var(--primary-color); font-size: 11px; padding: 4px 8px; border: 1px solid var(--primary-color); }
-    .badge-good { background: var(--sugar-good); color: #000; }
-    .badge-bad { background: var(--sugar-bad); color: #fff; }
+        /* 1. የመስታወት አሞሌ (Glassmorphism Header) */
+        .app-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background-color: rgba(31, 40, 51, 0.45); /* በጣም ቀጭን ከለር */
+            backdrop-filter: blur(12px); /* ከጀርባ ያለውን ፒዲኤፍ ብዥ አድርጎ እንደ መስታወት የሚያሳይ */
+            -webkit-backdrop-filter: blur(12px);
+            padding: 0 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+        }
 
-    .table-container { overflow-x: auto; margin-top: 15px; border-radius: 12px; border: 0.5px solid rgba(255,255,255,0.08); }
-    table { width: 100%; border-collapse: collapse; background: var(--card-bg); font-size: 13px; text-align: center; }
-    th, td { padding: 14px 10px; border-bottom: 1px solid rgba(255,255,255,0.03); }
-    th { background: rgba(255,255,255,0.02); color: var(--primary-color); font-weight: 600; }
-    
-    /* 💊 Medication Flex Inputs */
-    .med-flex-inputs { display: flex; gap: 10px; margin-top: 10px; }
-    .med-flex-inputs input { margin: 0; }
-  </style>
+        .brand {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--primary-glow);
+            text-shadow: 0 0 10px rgba(102, 252, 241, 0.3);
+        }
+
+        /* PDF መያዣ ክፍል */
+        #pdf-container {
+            position: fixed;
+            top: 0; /* ሙሉ ስክሪን ሆኖ ከሄደሩ በታች እንዲያልፍ ከላይ 0 ሆኗል */
+            bottom: 0; /* ከታችኛው ባር በታች እንዲያልፍ 0 ሆኗል */
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            overflow-y: auto;
+            overflow-x: auto;
+            background: #121212;
+            padding-top: 80px; /* ጽሑፉ መጀመሪያ ሲከፈት በሄደሩ እንዳይጋረድ ማድረጊያ */
+            padding-bottom: 90px;
+            scroll-behavior: smooth;
+        }
+
+        canvas {
+            display: block;
+            margin: 0 auto;
+            border-radius: 4px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* የታችኛው የቁጥጥር ባር (ይህም የመስታወት ውጤት አለው) */
+        .control-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            background-color: rgba(31, 40, 51, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0 20px;
+            gap: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 100;
+        }
+
+        .btn {
+            background-color: rgba(11, 12, 16, 0.8);
+            color: #ffffff;
+            border: 2px solid #2c3540;
+            padding: 8px 22px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn:focus, .btn:hover {
+            background-color: var(--primary-glow);
+            color: #0b0c10;
+            outline: none;
+            transform: scale(1.08);
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        .info-badge {
+            font-size: 15px;
+            font-weight: bold;
+            background: rgba(11, 12, 16, 0.8);
+            padding: 6px 15px;
+            border-radius: 20px;
+            border: 1px solid #2c3540;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+    </style>
 </head>
-<body onclick="closeDropdowns(event)">
+<body>
 
-  <div class="app-container">
-    
-    <div class="app-header" id="app-header-bar">
-      <h1 class="app-title" id="main-header-title">Sugar Log & Info</h1>
+    <div id="splash-screen">
+        <i class="fa-solid fa-book-open-reader splash-logo"></i>
+        <h2 style="letter-spacing: 2px;">NEXUS TV READER</h2>
     </div>
 
-    <div class="app-content" id="app-main-content">
-      
-      <!-- 🔐 SECURE LOGIN/SIGNUP SECTION -->
-      <div id="auth-section" class="auth-box">
-        <h2 style="font-size:26px; font-weight:800; margin-bottom:10px; color:var(--primary-color);">Sugar Log Portal</h2>
-        <p style="color:var(--text-muted); font-size:14px; margin-bottom:25px;">Secure Blood Sugar Tracking & Education</p>
-        <div class="input-group">
-          <input type="text" id="reg-fullname" class="hidden" placeholder="Full Name" />
-          <input type="text" id="username" placeholder="Username" />
-          
-          <div class="pass-container">
-            <input type="password" id="password" placeholder="Password" />
-            <span class="pass-toggle" onclick="togglePasswordVisibility()">👁️</span>
-          </div>
+    <div id="file-selector-container">
+        <div class="upload-card">
+            <i class="fa-solid fa-folder-open" style="font-size: 60px; color: var(--primary-glow); margin-bottom: 20px;"></i>
+            <h3 style="margin-bottom: 10px;">PDF ፋይል ይምረጡ</h3>
+            <input type="file" id="file-input" accept="application/pdf">
+            <button class="btn" id="browse-btn" style="margin: 0 auto;" autofocus><i class="fa-solid fa-search"></i> ፋይል ፈልግ (OK)</button>
         </div>
-        <button id="main-auth-btn" onclick="handleAuth()">Log In</button>
-        <button class="secondary-btn" id="toggle-auth-btn" onclick="toggleAuthMode()">Create Account</button>
-      </div>
-
-      <!-- 📚 TAB 1: HOME PAGE (EDUCATIONAL EXPANDABLE PORTAL) -->
-      <div id="home-tab-content" class="info-container hidden">
-        <p style="text-align: center; font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">👇 ካርዶቹን በመንካት ዝርዝር መረጃዎችንና መፍትሄዎችን ይመልከቱ</p>
-        
-        <div class="info-card" onclick="toggleCard(this)">
-          <span class="info-badge">ስለ ስኳር በሽታ (About Diabetes)</span>
-          <h3><span>🧬 የስኳር በሽታ ምንድን ነው?</span> <span class="arrow-icon">▼</span></h3>
-          <p>የስኳር በሽታ (Diabetes) ሰውነታችን የሚወስደውን ምግብ ወደ ኃይል ለመቀየር የሚያስችለውን የኢንሱሊን ሆርሞን ማምረት ሲያቅተው የሚከሰት የጤና እክል ነው።</p>
-          <div class="extra-details">
-            <strong style="color:var(--primary-color);">📌 ተጨማሪ ዝርዝር መረጃ፡</strong><br>
-            ኢንሱሊን በቆሽት የሚመረት ሆርሞን ሲሆን፣ በደማችን ውስጥ ያለው ስኳር ወደ ሴሎቻችን ገብቶ ኃይል እንዲሆን በሩን የመክፈት ኃላፊነት አለበት። ኢንሱሊን ከሌለ ስኳሩ በደም ውስጥ ይከማችና የደም ሥሮችን፣ ልብን፣ ኩላሊትንና አይንን ይጎዳል።
-          </div>
-        </div>
-
-        <div class="info-card" onclick="toggleCard(this)">
-          <span class="info-badge">ዓይነቶች (Types)</span>
-          <h3><span>📊 ዋና ዋና የስኳር በሽታ ዓይነቶች</span> <span class="arrow-icon">▼</span></h3>
-          <p>ዓይነት 1 (ኢንሱሊን ማምረት ማቆም) እና ዓይነት 2 (ኢንሱሊን በአግባቡ አለመጠቀም) በመባል በሁለት ይከፈላል።</p>
-          <div class="extra-details">
-            <strong style="color:var(--primary-color);">📌 ዓይነት 1 ስኳር (Type 1):</strong> ሰውነት ኢንሱሊን ማምረት ሲያቆም ነው። በየቀኑ ኢንሱሊን መውሰድ ግዴታ ነው።<br><br>
-            <strong style="color:var(--primary-color);">📌 ዓይነት 2 ስኳር (Type 2):</strong> በጣም የተለመደው ነው። ሰውነት ኢንሱሊን በአግባቡ መጠቀም ሲያቅተው ነው። በስፖርት እና አመጋገብ መከላከል ይቻላል።
-          </div>
-        </div>
-
-        <div class="info-card" onclick="toggleCard(this)">
-          <span class="info-badge">ምልክቶች (Symptoms)</span>
-          <h3><span>🚨 ሊታወቁ የሚገቡ ዋና ዋና ምልክቶች</span> <span class="arrow-icon">▼</span></h3>
-          <p>በተደጋጋሚ መሽናት፣ ከፍተኛ የውሃ ጥም መኖር፣ ያለምክንያት ክብደት መቀነስ እና ቶሎ ቶሎ መልፈስፈስ።</p>
-          <div class="extra-details">
-            <strong style="color:var(--primary-color);">⚠️ ሌሎች ምልክቶች፡</strong><br>
-            • የዕይታ ብዥታ (Blurry Vision)<br>
-            • የእጅ ወይም የእግር መደንዘዝ ስሜት<br>
-            • ትናንሽ ቁስሎች ቶሎ የመዳን ፍጥነት መቀነስ
-          </div>
-        </div>
-
-        <div class="info-card" onclick="toggleCard(this)">
-          <span class="info-badge">የስኳር መጠን መለኪያ (Standard Levels)</span>
-          <h3><span>🩸 መደበኛ የስኳር መጠን ስንት ነው?</span> <span class="arrow-icon">▼</span></h3>
-          <p>በፆም (Fasting) ከ70-100 mg/dL ጥሩ ሲሆን፣ ከምግብ በኋላ ደግሞ ከ140 mg/dL በታች መሆን አለበት።</p>
-          <div class="extra-details">
-            <strong style="color:var(--primary-color);">📈 ሙሉ የምዘና ሰንጠረዥ፦</strong><br>
-            • ፆም ላይ 70-100 መደበኛ / 101-125 ቅድመ ስኳር / 126+ የስኳር በሽታ።<br>
-            • ከምግብ በኋላ ከ140 በታች መደበኛ / 140-199 ቅድመ ስኳር / 200+ የስኳር በሽታ።
-          </div>
-        </div>
-      </div>
-
-      <!-- 📊 TAB 2: RECORDS LOGGING -->
-      <div id="records-tab-content" class="page-section hidden">
-        <div id="patient-input-area" class="log-form-container">
-          <h3 class="form-title"><span>🩸</span> አዲስ የስኳር መጠን መመዝገቢያ (New Log)</h3>
-          
-          <div class="modern-input-wrapper">
-            <span class="field-icon">📊</span>
-            <input type="number" id="sugar" placeholder="የስኳር መጠን ያስገቡ (mg/dL)" />
-          </div>
-          
-          <div style="margin-bottom: 14px; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-            <label class="time-label">🕒 የተለካበት ሰዓት (Time Recorded) *ግዴታ</label>
-            <input type="time" id="sugar-time" style="margin: 0;" />
-          </div>
-          
-          <div class="modern-input-wrapper">
-            <span class="field-icon">📝</span>
-            <input type="text" id="note" placeholder="ማስታወሻ (ምሳሌ፡ በፆም፣ ከምሳ በኋላ...)" />
-          </div>
-          
-          <button onclick="addRecord()" style="margin-bottom: 0; background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%); color: #000;">🔒 መረጃውን መዝግብ (Save Record)</button>
-        </div>
-
-        <h3 id="records-list-title" style="margin-top: 20px; font-size: 16px; font-weight: 700; padding-left: 4px;">የተመዘገቡ የጤና መረጃዎች</h3>
-        <div class="table-container">
-          <table>
-            <thead><tr id="table-header-row"><th>ቀን እና ሰዓት</th><th>መጠን</th><th>ሁኔታ</th><th>ማስታወሻ</th></tr></thead>
-            <tbody id="records"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- 👤 TAB 3: ME PROFILE (WITH NEW DOCTOR & MEDICATION TRACKER) -->
-      <div id="me-tab-content" class="page-section hidden">
-        
-        <div class="profile-header-actions">
-          <div class="profile-three-dots" onclick="toggleSettingsDropdown(event)">⋮</div>
-          <div class="settings-dropdown hidden" id="my-settings-menu">
-            <div class="settings-item" onclick="logout()">👋 Log Out</div>
-            <div class="settings-item danger" onclick="deleteAccount()">🗑️ Delete Account</div>
-          </div>
-        </div>
-
-        <div class="pro-card">
-          <div class="pfp-container">
-            <img id="my-pfp-display" class="pfp-img" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" />
-            <label class="pfp-upload-overlay">Edit<input type="file" accept="image/*" style="display:none;" onchange="uploadProfilePic(this)" /></label>
-          </div>
-          <h2 id="user-fullname-display" style="margin:5px 0; font-size:18px;">Loading...</h2>
-          <p id="user-username-display" style="color:var(--text-muted); margin:0; font-size:13px;">@username</p>
-          <div style="margin-top:12px;">
-            <span id="user-role-display" class="badge doc-badge">Patient</span>
-          </div>
-        </div>
-
-        <div class="stat-dashboard-card" id="patient-stats-card">
-          <h3 style="margin-top:0; font-size:15px; color:var(--primary-color); border-bottom:0.5px solid rgba(255,255,255,0.1); padding-bottom:8px; margin-bottom:5px;">📋 የጤና መረጃ ማጠቃለያ (Logs Summary)</h3>
-          <div class="stat-row"><span class="stat-label">🔢 አጠቃላይ የምዝገባ ብዛት (Total Records):</span><span class="stat-val" id="dash-total-logs">0</span></div>
-          <div class="stat-row"><span class="stat-label">🩸 የመጨረሻ የስኳር መጠን (Last Level):</span><span class="stat-val" id="dash-last-level">-- mg/dL</span></div>
-          <div class="stat-row"><span class="stat-label">🕒 የተመዘገበበት ሰዓት (Last Recorded Time):</span><span class="stat-val" id="dash-last-time">-- : --</span></div>
-        </div>
-
-        <!-- 🩺 NEW SECTION: DOCTOR'S ADVICE -->
-        <div class="log-form-container" style="margin-top: 20px;">
-          <h3 class="form-title"><span>🩺</span> የዶክተር ምክር ማስታወሻ (Doctor's Advice)</h3>
-          <div class="modern-input-wrapper">
-            <span class="field-icon" style="top:25px;">📋</span>
-            <textarea id="doctor-advice-input" rows="3" placeholder="ዶክተር የሰጠዎትን ምክር እዚህ ይፃፉ... (ለምሳሌ፡ ጣፋጭ መቀነስ፣ በቀን 30 ደቂቃ መራመድ...)" style="width:100%; background:var(--input-bg); color:#fff; border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:12px 12px 12px 45px; box-sizing:border-box; font-family:inherit; outline:none; font-size:14px; resize:none;"></textarea>
-          </div>
-          <button onclick="saveDoctorAdvice()" style="padding:12px; margin-top:8px; font-size:14px; background:#4cd964; color:#000;">💾 ምክሩን አስቀምጥ (Save Advice)</button>
-        </div>
-
-        <!-- 💊 NEW SECTION: MEDICATION TRACKER -->
-        <div class="log-form-container">
-          <h3 class="form-title"><span>💊</span> የበሽታው መድኃኒቶች መከታተያ (Medication)</h3>
-          <div class="modern-input-wrapper">
-            <span class="field-icon">🧴</span>
-            <input type="text" id="med-name" placeholder="የመድኃኒቱ ስም (e.g. Metformin, Insulin)" />
-          </div>
-          <div class="med-flex-inputs">
-            <input type="text" id="med-dose" placeholder="መጠን (e.g. 500mg, 10 units)" />
-            <input type="text" id="med-freq" placeholder="በቀን ስንት ጊዜ (e.g. 2x በቀን)" />
-          </div>
-          <button onclick="addMedication()" style="padding:12px; font-size:14px; background:var(--primary-color); color:#000;">➕ መድኃኒት ጨምር (Add Medicine)</button>
-          
-          <div class="table-container" style="margin-top:15px;">
-            <table>
-              <thead><tr><th>የመድኃኒት ስም</th><th>መጠን</th><th>ጊዜ/ማዘዣ</th><th>ድርጊት</th></tr></thead>
-              <tbody id="medication-list-body"></tbody>
-            </table>
-          </div>
-        </div>
-
-      </div>
-
     </div>
 
-    <!-- 📱 BOTTOM NAVIGATION BAR -->
-    <div class="bottom-nav hidden" id="app-bottom-nav">
-      <button id="nav-home" class="nav-item active" onclick="switchTab('home')"><span class="icon">🏠</span><span>Home</span></button>
-      <button id="nav-records" class="nav-item" onclick="switchTab('records')"><span class="icon">📊</span><span>Sugar Log</span></button>
-      <button id="nav-me" class="nav-item" onclick="switchTab('me')"><span class="icon">👤</span><span>Me</span></button>
+    <div id="main-viewer">
+        <div class="app-header">
+            <div class="brand"><i class="fa-solid fa-display"></i> Smart TV Reader</div>
+            <button class="btn" id="back-to-menu-btn" style="padding: 4px 12px; font-size: 11px;"><i class="fa-solid fa-home"></i> ዝጋ</button>
+        </div>
+
+        <div id="pdf-container">
+            <canvas id="pdf-canvas"></canvas>
+        </div>
+
+        <div class="control-bar">
+            <button id="prev-btn" class="btn"><i class="fa-solid fa-arrow-left"></i> የበፊቱ</button>
+            <span class="info-badge">
+                <i class="fa-regular fa-file-lines" style="color: var(--primary-glow);"></i>
+                <span id="page-info">0 / 0</span>
+            </span>
+            <button id="next-btn" class="btn">ቀጣይ <i class="fa-solid fa-arrow-right"></i></button>
+            
+            <span class="info-badge">
+                <i class="fa-solid fa-magnifying-glass" style="color: var(--primary-glow);"></i>
+                <span id="zoom-info">100%</span>
+            </span>
+        </div>
     </div>
 
-  </div>
+    <script>
+        let pdfDoc = null,
+            pageNum = 1,
+            pageIsRendering = false,
+            pageNumPending = null,
+            scale = 1.3;
 
-  <script>
-    const DATABASE_URL = "https://yddj-13184-default-rtdb.firebaseio.com/"; 
-    let currentUserKey = localStorage.getItem("currentSugarUserKey") || null;
-    let cachedUserData = null;
-    let isLoginMode = true;
+        const canvas = document.getElementById('pdf-canvas'),
+              ctx = canvas.getContext('2d'),
+              container = document.getElementById('pdf-container');
 
-    function toggleCard(cardElement) { cardElement.classList.toggle("expanded"); }
-    function toggleSettingsDropdown(e) { e.stopPropagation(); document.getElementById("my-settings-menu").classList.toggle("hidden"); }
-    function closeDropdowns(e) { const menu = document.getElementById("my-settings-menu"); if(menu && !menu.classList.contains("hidden")) { menu.classList.add("hidden"); } }
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
 
-    function togglePasswordVisibility() {
-      const passInput = document.getElementById("password");
-      const toggleBtn = document.querySelector(".pass-toggle");
-      if (passInput && passInput.type === "password") {
-        passInput.type = "text"; toggleBtn.innerText = "🙈";
-      } else if(passInput) {
-        passInput.type = "password"; toggleBtn.innerText = "👁️";
-      }
-    }
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                splash.style.opacity = '0';
+                setTimeout(() => splash.style.display = 'none', 500);
+            }, 1500);
+        });
 
-    async function hashPassword(string) {
-      const utf8 = new TextEncoder().encode(string);
-      const hashBuffer = await crypto.subtle.digest('SHA-256', utf8);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      const hashHex = hashArray.map(bytes => bytes.toString(16).padStart(2, '0')).join('');
-      return hashHex;
-    }
+        const fileInput = document.getElementById('file-input');
+        document.getElementById('browse-btn').addEventListener('click', () => fileInput.click());
 
-    function formatTo12Hour(timeStr) {
-      if (!timeStr) return '--:--';
-      const parts = timeStr.split(':');
-      let hours = parseInt(parts[0]);
-      const minutes = parts[1];
-      const ampm = hours >= 12 ? 'PM' : 'AM';
-      hours = hours % 12;
-      hours = hours ? hours : 12; 
-      return `${hours}:${minutes} ${ampm}`;
-    }
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file && file.type === "application/pdf") {
+                const fileReader = new FileReader();
+                fileReader.onload = function() {
+                    const typedarray = new Uint8Array(this.result);
+                    loadPdf(typedarray);
+                };
+                fileReader.readAsArrayBuffer(file);
+            }
+        });
 
-    async function firebaseRequest(path, method = "GET", data = null) {
-      const options = { method, headers: { "Content-Type": "application/json" } };
-      if (data) options.body = JSON.stringify(data);
-      const res = await fetch(`${DATABASE_URL}${path}.json`, options);
-      return res.json();
-    }
-
-    function switchTab(tabName) {
-      const views = ['home', 'records', 'me'];
-      views.forEach(v => {
-        document.getElementById(`${v}-tab-content`).classList.add("hidden");
-        if(document.getElementById(`nav-${v}`)) document.getElementById(`nav-${v}`).classList.remove("active");
-      });
-
-      document.getElementById(`${tabName}-tab-content`).classList.remove("hidden");
-      if(document.getElementById(`nav-${tabName}`)) document.getElementById(`nav-${tabName}`).classList.add("active");
-
-      const mainTitle = document.getElementById("main-header-title");
-      if (tabName === 'home') mainTitle.innerText = "Health Information Portal 📚";
-      else if (tabName === 'records') mainTitle.innerText = "Sugar Logs Tracker 📊";
-      else if (tabName === 'me') mainTitle.innerText = "My Profile 👤";
-
-      if (tabName === 'records') renderRecords();
-      else if (tabName === 'me') fetchProfileData();
-    }
-
-    function getStatusBadge(level, note) {
-      const val = parseInt(level);
-      if (isNaN(val)) return `<td><span class="badge">Unknown</span></td>`;
-      const cleanNote = note ? note.toLowerCase() : "";
-      const isFasting = cleanNote.includes("fasting") || cleanNote.includes("በፆም") || cleanNote.includes("ፆም");
-      if (isFasting) {
-        return (val >= 70 && val <= 100) ? `<td><span class="badge badge-good">😊 ጥሩ (Good Fasting)</span></td>` : `<td><span class="badge badge-bad">⚠️ መጥፎ (High/Low)</span></td>`;
-      } else {
-        return (val >= 70 && val <= 140) ? `<td><span class="badge badge-good">😊 ጥሩ (Good)</span></td>` : `<td><span class="badge badge-bad">⚠️ መጥፎ (High/Low)</span></td>`;
-      }
-    }
-
-    async function renderRecords() {
-      const tbody = document.getElementById("records"); tbody.innerHTML = "";
-      const data = await firebaseRequest(`/users/${currentUserKey}/records`);
-      if(!data) return;
-      Object.keys(data).reverse().forEach(k => {
-        const rec = data[k];
-        tbody.innerHTML += `<tr><td>${rec.date} @ ${formatTo12Hour(rec.time)}</td><td><strong>${rec.level} mg/dL</strong></td>${getStatusBadge(rec.level, rec.note)}<td>${escapeHTML(rec.note)}</td></tr>`;
-      });
-    }
-
-    async function addRecord() {
-      const level = document.getElementById("sugar").value;
-      const time = document.getElementById("sugar-time").value;
-      const note = document.getElementById("note").value;
-      if(!level) return alert("⚠️ Sugar level ያስገቡ!");
-      if(!time) return alert("🛑 ግዴታ ነው፡ እባክዎ የስኳር መጠኑን የለኩበትን ሰዓት ያስገቡ!");
-      await firebaseRequest(`/users/${currentUserKey}/records`, "POST", { level: level, time: time, note: note, date: new Date().toLocaleDateString() });
-      document.getElementById("sugar").value = ""; document.getElementById("sugar-time").value = ""; document.getElementById("note").value = "";
-      renderRecords();
-    }
-
-    // 🩺 የዶክተር ምክርን ሴቭ ማድረጊያ ፋንክሽን
-    async function saveDoctorAdvice() {
-      const advice = document.getElementById("doctor-advice-input").value.trim();
-      await firebaseRequest(`/users/${currentUserKey}/doctorAdvice`, "PUT", advice);
-      alert("✅ የዶክተር ምክር በተሳካ ሁኔታ ተቀምጧል!");
-    }
-
-    // 💊 አዲስ መድኃኒት መመዝገቢያ ፋንክሽን
-    async function addMedication() {
-      const name = document.getElementById("med-name").value.trim();
-      const dose = document.getElementById("med-dose").value.trim();
-      const freq = document.getElementById("med-freq").value.trim();
-      
-      if(!name || !dose || !freq) return alert("⚠️ እባክዎ ሁሉንም የመድኃኒት መረጃዎች ይሙሉ!");
-      
-      await firebaseRequest(`/users/${currentUserKey}/medications`, "POST", { name, dose, freq });
-      document.getElementById("med-name").value = "";
-      document.getElementById("med-dose").value = "";
-      document.getElementById("med-freq").value = "";
-      renderMedications();
-    }
-
-    // 💊 የተመዘገቡ መድኃኒቶችን ከዳታቤዝ አውጥቶ ማሳያ
-    async function renderMedications() {
-      const tbody = document.getElementById("medication-list-body");
-      tbody.innerHTML = "";
-      const data = await firebaseRequest(`/users/${currentUserKey}/medications`);
-      if(!data) {
-        tbody.innerHTML = `<tr><td colspan="4" style="color:var(--text-muted);">ምንም የተመዘገበ መድኃኒት የለም</td></tr>`;
-        return;
-      }
-      Object.keys(data).forEach(k => {
-        const med = data[k];
-        tbody.innerHTML += `<tr>
-          <td><strong>${escapeHTML(med.name)}</strong></td>
-          <td>${escapeHTML(med.dose)}</td>
-          <td>${escapeHTML(med.freq)}</td>
-          <td><button onclick="deleteMedication('${k}')" style="padding:4px 8px; margin:0; font-size:11px; background:var(--sugar-bad); color:#fff; border-radius:6px;">Delete</button></td>
-        </tr>`;
-      });
-    }
-
-    // 💊 መድኃኒት ማጥፊያ ፋንክሽን
-    async function deleteMedication(key) {
-      if(confirm("መድኃኒቱን ለመሰረዝ እርግጠኛ ነዎት?")) {
-        await firebaseRequest(`/users/${currentUserKey}/medications/${key}`, "DELETE");
-        renderMedications();
-      }
-    }
-
-    async function uploadProfilePic(input) {
-      const file = input.files[0]; if (!file) return;
-      if (file.size > 500 * 1024) return alert("Please upload profile image smaller than 500KB!");
-      const reader = new FileReader();
-      reader.onload = async function (e) {
-        document.getElementById("my-pfp-display").src = e.target.result;
-        await firebaseRequest(`/users/${currentUserKey}/pfp`, "PUT", e.target.result);
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function toggleAuthMode() {
-      isLoginMode = !isLoginMode;
-      document.getElementById("reg-fullname").classList.toggle("hidden", isLoginMode);
-      document.getElementById("main-auth-btn").innerText = isLoginMode ? "Log In" : "Register Account";
-      document.getElementById("toggle-auth-btn").innerText = isLoginMode ? "Create Account" : "Back to Log In";
-    }
-
-    async function handleAuth() {
-      const user = document.getElementById("username").value.trim();
-      const pass = document.getElementById("password").value;
-      const authBtn = document.getElementById("main-auth-btn");
-
-      if (!user || !pass) return alert("⚠️ እባክዎ ሁሉንም ክፍት ቦታዎች ይሙሉ!");
-      if (!isLoginMode && pass.length < 4) return alert("⚠️ የይለፍ ቃል ርዝመት ቢያንስ 4 ሆሄያት መሆን አለበት!");
-
-      authBtn.disabled = true;
-      authBtn.innerText = "Processing...";
-
-      try {
-        const allUsers = await firebaseRequest("/users") || {};
-        const hashedInputPassword = await hashPassword(pass);
-        
-        if (isLoginMode) {
-          let foundKey = null; let passwordCorrect = false;
-          for(let k in allUsers) { 
-            if(allUsers[k].username?.toLowerCase() === user.toLowerCase()) { 
-              foundKey = k; 
-              if(allUsers[k].password === hashedInputPassword) passwordCorrect = true; 
-              break; 
-            } 
-          }
-          if(foundKey && passwordCorrect) { currentUserKey = foundKey; localStorage.setItem("currentSugarUserKey", foundKey); showTracker(); } 
-          else if (foundKey && !passwordCorrect) { alert("❌ ትክክለኛ ያልሆነ የይለፍ ቃል!"); } 
-          else { alert("❌ ይህ መለያ ስም (Username) አልተገኘም!"); }
-        } else {
-          let usernameExists = false;
-          for(let k in allUsers) {
-            if(allUsers[k].username?.toLowerCase() === user.toLowerCase()) { usernameExists = true; break; }
-          }
-          if(usernameExists) {
-            alert("❌ ይህ መለያ ስም (Username) ቀድሞ ተይዟል! እባክዎ ሌላ ይሞክሩ።");
-            authBtn.disabled = false; authBtn.innerText = "Register Account"; return;
-          }
-          const res = await firebaseRequest("/users", "POST", { fullname: document.getElementById("reg-fullname").value || "Anonymous", username: user, password: hashedInputPassword, role: "patient", pfp: "" });
-          if(res) { currentUserKey = res.name; localStorage.setItem("currentSugarUserKey", res.name); showTracker(); }
+        function loadPdf(data) {
+            pdfjsLib.getDocument(data).promise.then(pdfDoc_ => {
+                pdfDoc = pdfDoc_;
+                document.getElementById('file-selector-container').style.display = 'none';
+                document.getElementById('main-viewer').style.display = 'flex';
+                renderPage(pageNum);
+                document.getElementById('next-btn').focus();
+            }).catch(err => {
+                alert('ፒዲኤፍ መክፈት አልተቻለም!');
+            });
         }
-      } catch (err) {
-        alert("An error occurred. Please check network connection.");
-      } finally {
-        authBtn.disabled = false; authBtn.innerText = isLoginMode ? "Log In" : "Register Account";
-      }
-    }
 
-    async function showTracker() {
-      document.getElementById("auth-section").classList.add("hidden");
-      document.getElementById("app-bottom-nav").classList.remove("hidden");
-      cachedUserData = await firebaseRequest(`/users/${currentUserKey}`);
-      switchTab('home');
-    }
+        const renderPage = num => {
+            pageIsRendering = true;
+            pdfDoc.getPage(num).then(page => {
+                if (scale > 1.3) {
+                    canvas.style.maxWidth = 'none';
+                } else {
+                    canvas.style.maxWidth = '100%';
+                }
 
-    async function fetchProfileData() {
-      cachedUserData = await firebaseRequest(`/users/${currentUserKey}`);
-      if(cachedUserData) {
-        document.getElementById("user-fullname-display").innerText = cachedUserData.fullname;
-        document.getElementById("user-username-display").innerText = "@" + cachedUserData.username;
-        document.getElementById("user-role-display").innerText = "Patient";
-        if(cachedUserData.pfp) document.getElementById("my-pfp-display").src = cachedUserData.pfp;
+                const viewport = page.getViewport({ scale: scale });
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
 
-        // የዶክተር ምክር ካለ ማንበብ
-        document.getElementById("doctor-advice-input").value = cachedUserData.doctorAdvice || "";
+                const renderContext = { canvasContext: ctx, viewport };
 
-        // መድኃኒቶችን ሬንደር ማድረግ
-        renderMedications();
+                page.render(renderContext).promise.then(() => {
+                    pageIsRendering = false;
+                    if (pageNumPending !== null) {
+                        renderPage(pageNumPending);
+                        pageNumPending = null;
+                    }
+                });
+                document.getElementById('page-info').textContent = `${num} / ${pdfDoc.numPages}`;
+                document.getElementById('zoom-info').textContent = `${Math.round(scale * 100)}%`;
+            });
+        };
 
-        document.getElementById("patient-stats-card").classList.remove("hidden");
-        const recs = cachedUserData.records || {};
-        const recKeys = Object.keys(recs);
-        const totalLogs = recKeys.length;
-        document.getElementById("dash-total-logs").innerText = totalLogs;
+        const queueRenderPage = num => {
+            if (pageIsRendering) {
+                pageNumPending = num;
+            } else {
+                renderPage(num);
+            }
+        };
+
+        const showPrevPage = () => {
+            if (pageNum <= 1) return;
+            pageNum--;
+            queueRenderPage(pageNum);
+            container.scrollTop = 0;
+        };
+
+        const showNextPage = () => {
+            if (pdfDoc && pageNum >= pdfDoc.numPages) return;
+            pageNum++;
+            queueRenderPage(pageNum);
+            container.scrollTop = 0;
+        };
+
+        const zoomIn = () => {
+            if (scale >= 4.0) return;
+            scale += 0.2;
+            queueRenderPage(pageNum);
+        };
+
+        const zoomOut = () => {
+            if (scale <= 0.8) return;
+            scale -= 0.2;
+            queueRenderPage(pageNum);
+        };
+
+        // የሪሞት ቁልፎች ሙሉ ስርጭት
+        document.addEventListener('keydown', (e) => {
+            if (document.getElementById('main-viewer').style.display === 'flex') {
+                
+                // 1. የቻናል ቁልፎች ለዙም ቁጥጥር (CH+ / CH-)
+                if (e.key === 'PageUp' || e.keyCode === 166 || e.keyCode === 33) { 
+                    // CH+ ከተጫነ ዙም ይጨምራል
+                    e.preventDefault();
+                    zoomIn();
+                } else if (e.key === 'PageDown' || e.keyCode === 167 || e.keyCode === 34) { 
+                    // CH- ከተጫነ ዙም ይቀንሳል
+                    e.preventDefault();
+                    zoomOut();
+                }
+                
+                // 2. ቀስት ቁልፎች ለገጽ መቀየር እና ለስክሮል ብቻ
+                else if (e.key === 'ArrowLeft') {
+                    showPrevPage();
+                    document.getElementById('prev-btn').focus();
+                } else if (e.key === 'ArrowRight') {
+                    showNextPage();
+                    document.getElementById('next-btn').focus();
+                } else if (e.key === 'ArrowUp') {
+                    // የላይኛው ቀስት ጽሑፉን ወደላይ ብቻ ያንሸራትታል
+                    container.scrollTop -= 60; 
+                    e.preventDefault();
+                } else if (e.key === 'ArrowDown') {
+                    // የታችኛው ቀስት ጽሑፉን ወደታች ብቻ ያንሸራትታል
+                    container.scrollTop += 60;
+                    e.preventDefault();
+                }
+            }
+        });
+
+        document.getElementById('prev-btn').addEventListener('click', showPrevPage);
+        document.getElementById('next-btn').addEventListener('click', showNextPage);
         
-        if(totalLogs > 0) {
-          const lastRecKey = recKeys[recKeys.length - 1];
-          const lastRec = recs[lastRecKey];
-          document.getElementById("dash-last-level").innerText = `${lastRec.level} mg/dL`;
-          document.getElementById("dash-last-time").innerText = `${lastRec.date} @ ${formatTo12Hour(lastRec.time)}`;
-        } else {
-          document.getElementById("dash-last-level").innerText = "-- mg/dL";
-          document.getElementById("dash-last-time").innerText = "-- : --";
-        }
-      }
-    }
-
-    function logout() { localStorage.removeItem("currentSugarUserKey"); location.reload(); }
-
-    async function deleteAccount() {
-      const confirmDelete = confirm("⚠️ ማስጠንቀቂያ፦ አካውንትዎን ሙሉ በሙሉ ለማጥፋት እርግጠኛ ነዎት? ይህ ድርጊት ወደ ኋላ አይመለስም!");
-      if(confirmDelete) {
-        await firebaseRequest(`/users/${currentUserKey}`, "DELETE");
-        alert("✅ አካውንትዎ በተሳካ ሁኔታ ጠፍቷል።");
-        logout();
-      }
-    }
-
-    if (currentUserKey) { showTracker(); }
-    function escapeHTML(s) { return s ? s.replace(/[&<>'"]/g, '') : ''; }
-  </script>
+        document.getElementById('back-to-menu-btn').addEventListener('click', () => {
+            pageNum = 1;
+            scale = 1.3;
+            document.getElementById('main-viewer').style.display = 'none';
+            document.getElementById('file-selector-container').style.display = 'flex';
+            document.getElementById('browse-btn').focus();
+        });
+    </script>
 </body>
 </html>
