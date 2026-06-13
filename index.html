@@ -3,16 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium Glassmorphism TV PDF Reader</title>
+    <title>Premium TV PDF Reader with Page Jump</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
-            --bg-color: #0b0c10;
-            --card-bg: rgba(31, 40, 51, 0.8); /* ለመስታወት ውጤት ግልጽነት ያለው ከለር */
-            --primary-glow: #66fcf1;
-            --text-color: #c5c6c7;
+            --bg-gradient: radial-gradient(circle at center, #141923 0%, #080a0f 100%);
+            --card-bg: rgba(25, 34, 49, 0.65);
+            --primary-glow: #00f2fe;
+            --accent-color: #4facfe;
+            --text-main: #ffffff;
+            --text-muted: #a0aec0;
+            --glass-border: rgba(255, 255, 255, 0.08);
         }
 
         * {
@@ -22,11 +25,12 @@
         }
 
         body {
-            background-color: var(--bg-color);
-            color: #ffffff;
-            font-family: 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             height: 100vh;
             overflow: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
         /* የማስተዋወቂያ ስክሪን (Splash Screen) */
@@ -36,7 +40,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle, #1f2833 0%, #0b0c10 100%);
+            background: radial-gradient(circle, #1a2230 0%, #05070a 100%);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -45,14 +49,16 @@
             transition: opacity 0.5s ease-out, visibility 0.5s;
         }
 
-        .splash-logo {
-            font-size: 80px;
-            color: var(--primary-glow);
-            text-shadow: 0 0 20px var(--primary-glow);
-            margin-bottom: 20px;
+        .splash-title {
+            font-size: 36px;
+            font-weight: 800;
+            letter-spacing: 4px;
+            background: linear-gradient(to right, #ffffff, #cfd9df);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        /* የፋይል መምረጫ ስክሪን */
+        /* የፋይል ማስመረጫ ገጽ */
         #file-selector-container {
             display: flex;
             flex-direction: column;
@@ -60,24 +66,27 @@
             align-items: center;
             height: 100vh;
             width: 100%;
+            padding: 20px;
         }
 
         .upload-card {
-            background-color: #1f2833;
-            padding: 40px;
-            border-radius: 15px;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 50px 40px;
+            border-radius: 24px;
             text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            border: 2px dashed var(--primary-glow);
-            max-width: 500px;
-            width: 90%;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6), inset 0 1px 1px var(--glass-border);
+            border: 1px solid var(--glass-border);
+            max-width: 550px;
+            width: 100%;
         }
 
         #file-input {
             display: none;
         }
 
-        /* ዋናው የንባብ ገጽ */
+        /* ዋናው የንባብ ገጽ (Cinema Viewer) */
         #main-viewer {
             display: none;
             flex-direction: column;
@@ -86,37 +95,44 @@
             position: relative;
         }
 
-        /* 1. የመስታወት አሞሌ (Glassmorphism Header) */
+        /* የተስተካከለ የላይኛው የመስታወት አሞሌ */
         .app-header {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            height: 60px;
-            background-color: rgba(31, 40, 51, 0.45); /* በጣም ቀጭን ከለር */
-            backdrop-filter: blur(12px); /* ከጀርባ ያለውን ፒዲኤፍ ብዥ አድርጎ እንደ መስታወት የሚያሳይ */
-            -webkit-backdrop-filter: blur(12px);
-            padding: 0 30px;
+            height: 70px;
+            background-color: rgba(10, 14, 22, 0.4);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            padding: 0 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid var(--glass-border);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
             z-index: 100;
         }
 
-        .brand {
-            font-size: 20px;
-            font-weight: bold;
-            color: var(--primary-glow);
-            text-shadow: 0 0 10px rgba(102, 252, 241, 0.3);
+        .brand-text {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        /* PDF መያዣ ክፍል */
+        .brand-text i {
+            color: var(--primary-glow);
+            filter: drop-shadow(0 0 8px var(--primary-glow));
+        }
+
+        /* PDF የፊልም እይታ ክፍል */
         #pdf-container {
             position: fixed;
-            top: 0; /* ሙሉ ስክሪን ሆኖ ከሄደሩ በታች እንዲያልፍ ከላይ 0 ሆኗል */
-            bottom: 0; /* ከታችኛው ባር በታች እንዲያልፍ 0 ሆኗል */
+            top: 0;
+            bottom: 0;
             left: 0;
             width: 100%;
             display: flex;
@@ -124,96 +140,135 @@
             align-items: flex-start;
             overflow-y: auto;
             overflow-x: auto;
-            background: #121212;
-            padding-top: 80px; /* ጽሑፉ መጀመሪያ ሲከፈት በሄደሩ እንዳይጋረድ ማድረጊያ */
-            padding-bottom: 90px;
+            background: #060709;
+            padding-top: 95px; /* ከባሩ በታች በምቾት እንዲጀምር */
+            padding-bottom: 115px; /* ከታችኛው ባር እንዳይጋጭ */
             scroll-behavior: smooth;
         }
 
         canvas {
             display: block;
             margin: 0 auto;
-            border-radius: 4px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
-            max-width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85);
+            max-width: 95%;
             height: auto;
+            border: 1px solid rgba(255,255,255,0.05);
         }
 
-        /* የታችኛው የቁጥጥር ባር (ይህም የመስታወት ውጤት አለው) */
+        /* የተስተካከለ እና ሙሉ ይዘት የያዘው የታችኛው የቁጥጥር ባር */
         .control-bar {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 70px;
-            background-color: rgba(31, 40, 51, 0.6);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            height: 90px;
+            background-color: rgba(10, 14, 22, 0.6);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
             display: flex;
-            justify-content: center;
+            justify-content: cubic-bezier(0.16, 1, 0.3, 1);
+            justify-content: space-between;
             align-items: center;
-            padding: 0 20px;
-            gap: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0 40px;
+            border-top: 1px solid var(--glass-border);
+            box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.4);
             z-index: 100;
         }
 
+        .controls-left, .controls-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* የቅንጦት የሪሞት አዝራሮች */
         .btn {
-            background-color: rgba(11, 12, 16, 0.8);
-            color: #ffffff;
-            border: 2px solid #2c3540;
-            padding: 8px 22px;
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-main);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 24px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            border-radius: 30px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
-            gap: 8px;
-            transition: all 0.2s ease;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
         .btn:focus, .btn:hover {
-            background-color: var(--primary-glow);
-            color: #0b0c10;
+            background: linear-gradient(135deg, var(--primary-glow), var(--accent-color));
+            color: #040608;
+            border-color: #ffffff;
             outline: none;
-            transform: scale(1.08);
-            box-shadow: 0 0 15px var(--primary-glow);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 242, 254, 0.35);
         }
 
         .info-badge {
-            font-size: 15px;
-            font-weight: bold;
-            background: rgba(11, 12, 16, 0.8);
-            padding: 6px 15px;
-            border-radius: 20px;
-            border: 1px solid #2c3540;
+            font-size: 14px;
+            font-weight: 600;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 10px 20px;
+            border-radius: 14px;
+            border: 1px solid var(--glass-border);
+            color: #e2e8f0;
             display: flex;
             align-items: center;
+            gap: 8px;
+        }
+
+        /* 1. የገጽ ቁጥር ማዘለያ ሳጥን ዲዛይን (Page Jump Input) */
+        .page-jump-container {
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            padding: 2px 10px;
             gap: 5px;
+        }
+
+        .page-input {
+            width: 60px;
+            background: transparent;
+            border: none;
+            color: var(--primary-glow);
+            font-size: 16px;
+            font-weight: 700;
+            text-align: center;
+            outline: none;
+            padding: 8px 0;
+        }
+
+        /* በሪሞት ቁጥር ሳጥኑ ላይ ሲያርፍ የሚፈጠር ፍንጣቂ ብርሃን */
+        .page-jump-container:focus-within {
+            border-color: var(--primary-glow);
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
         }
     </style>
 </head>
 <body>
 
     <div id="splash-screen">
-        <i class="fa-solid fa-book-open-reader splash-logo"></i>
-        <h2 style="letter-spacing: 2px;">NEXUS TV READER</h2>
+        <h1 class="splash-title">NEXUS TV READER</h1>
     </div>
 
     <div id="file-selector-container">
         <div class="upload-card">
-            <i class="fa-solid fa-folder-open" style="font-size: 60px; color: var(--primary-glow); margin-bottom: 20px;"></i>
-            <h3 style="margin-bottom: 10px;">PDF ፋይል ይምረጡ</h3>
+            <h2 style="font-size: 26px; font-weight: 700; margin-bottom: 25px;">ፒዲኤፍ ፋይል ይክፈቱ</h2>
             <input type="file" id="file-input" accept="application/pdf">
-            <button class="btn" id="browse-btn" style="margin: 0 auto;" autofocus><i class="fa-solid fa-search"></i> ፋይል ፈልግ (OK)</button>
+            <button class="btn" id="browse-btn" style="margin: 0 auto; padding: 14px 40px;" autofocus>ፋይል ፈልግ (OK)</button>
         </div>
     </div>
 
     <div id="main-viewer">
         <div class="app-header">
-            <div class="brand"><i class="fa-solid fa-display"></i> Smart TV Reader</div>
-            <button class="btn" id="back-to-menu-btn" style="padding: 4px 12px; font-size: 11px;"><i class="fa-solid fa-home"></i> ዝጋ</button>
+            <div class="brand-text"><i class="fa-solid fa-tv"></i> <span>NEXUS MEDIA</span></div>
+            <button class="btn" id="back-to-menu-btn" style="padding: 6px 18px; font-size: 13px;"><i class="fa-solid fa-arrow-rotate-left"></i> ዝጋ</button>
         </div>
 
         <div id="pdf-container">
@@ -221,17 +276,27 @@
         </div>
 
         <div class="control-bar">
-            <button id="prev-btn" class="btn"><i class="fa-solid fa-arrow-left"></i> የበፊቱ</button>
-            <span class="info-badge">
-                <i class="fa-regular fa-file-lines" style="color: var(--primary-glow);"></i>
-                <span id="page-info">0 / 0</span>
-            </span>
-            <button id="next-btn" class="btn">ቀጣይ <i class="fa-solid fa-arrow-right"></i></button>
+            <div class="controls-left">
+                <button id="prev-btn" class="btn"><i class="fa-solid fa-chevron-left"></i> የበፊቱ</button>
+                
+                <div class="page-jump-container">
+                    <input type="number" id="current-page-input" class="page-input" value="1" min="1">
+                    <span style="color: var(--text-muted); font-weight: 600;">/ <span id="total-pages-text">0</span></span>
+                </div>
+
+                <button id="next-btn" class="btn">ቀጣይ <i class="fa-solid fa-chevron-right"></i></button>
+            </div>
             
-            <span class="info-badge">
-                <i class="fa-solid fa-magnifying-glass" style="color: var(--primary-glow);"></i>
-                <span id="zoom-info">100%</span>
-            </span>
+            <div class="controls-right">
+                <span class="info-badge">
+                    <i class="fa-solid fa-expand" style="color: var(--primary-glow);"></i>
+                    <span id="zoom-info">100%</span>
+                </span>
+                
+                <span class="info-badge" style="background: rgba(255,255,255,0.01); color: var(--text-muted); font-size: 12px;">
+                    [CH+/CH-] ዙም | [ቀስቶች] ማሸብለያ
+                </span>
+            </div>
         </div>
     </div>
 
@@ -240,11 +305,12 @@
             pageNum = 1,
             pageIsRendering = false,
             pageNumPending = null,
-            scale = 1.3;
+            scale = 1.4;
 
         const canvas = document.getElementById('pdf-canvas'),
               ctx = canvas.getContext('2d'),
-              container = document.getElementById('pdf-container');
+              container = document.getElementById('pdf-container'),
+              pageInput = document.getElementById('current-page-input');
 
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
 
@@ -274,6 +340,9 @@
         function loadPdf(data) {
             pdfjsLib.getDocument(data).promise.then(pdfDoc_ => {
                 pdfDoc = pdfDoc_;
+                document.getElementById('total-pages-text').textContent = pdfDoc.numPages;
+                pageInput.max = pdfDoc.numPages;
+                
                 document.getElementById('file-selector-container').style.display = 'none';
                 document.getElementById('main-viewer').style.display = 'flex';
                 renderPage(pageNum);
@@ -286,10 +355,10 @@
         const renderPage = num => {
             pageIsRendering = true;
             pdfDoc.getPage(num).then(page => {
-                if (scale > 1.3) {
+                if (scale > 1.4) {
                     canvas.style.maxWidth = 'none';
                 } else {
-                    canvas.style.maxWidth = '100%';
+                    canvas.style.maxWidth = '95%';
                 }
 
                 const viewport = page.getViewport({ scale: scale });
@@ -305,7 +374,7 @@
                         pageNumPending = null;
                     }
                 });
-                document.getElementById('page-info').textContent = `${num} / ${pdfDoc.numPages}`;
+                pageInput.value = num; // የሳጥኑን ቁጥር ወቅታዊ ማድረግ
                 document.getElementById('zoom-info').textContent = `${Math.round(scale * 100)}%`;
             });
         };
@@ -317,6 +386,18 @@
                 renderPage(num);
             }
         };
+
+        // የገጽ ቁጥር እራስህ አስገብተህ Enter ስትጫን በቀጥታ ማዘለያ ማስተካከያ
+        pageInput.addEventListener('change', (e) => {
+            let targetPage = parseInt(e.target.value);
+            if (pdfDoc && targetPage >= 1 && targetPage <= pdfDoc.numPages) {
+                pageNum = targetPage;
+                queueRenderPage(pageNum);
+                container.scrollTop = 0;
+            } else {
+                e.target.value = pageNum; // ስህተት ቁጥር ከተጻፈ ወደ ነበረበት ይመልሰዋል
+            }
+        });
 
         const showPrevPage = () => {
             if (pageNum <= 1) return;
@@ -344,35 +425,33 @@
             queueRenderPage(pageNum);
         };
 
-        // የሪሞት ቁልፎች ሙሉ ስርጭት
+        // የሪሞት መቆጣጠሪያ
         document.addEventListener('keydown', (e) => {
             if (document.getElementById('main-viewer').style.display === 'flex') {
                 
-                // 1. የቻናል ቁልፎች ለዙም ቁጥጥር (CH+ / CH-)
                 if (e.key === 'PageUp' || e.keyCode === 166 || e.keyCode === 33) { 
-                    // CH+ ከተጫነ ዙም ይጨምራል
                     e.preventDefault();
                     zoomIn();
                 } else if (e.key === 'PageDown' || e.keyCode === 167 || e.keyCode === 34) { 
-                    // CH- ከተጫነ ዙም ይቀንሳል
                     e.preventDefault();
                     zoomOut();
                 }
-                
-                // 2. ቀስት ቁልፎች ለገጽ መቀየር እና ለስክሮል ብቻ
                 else if (e.key === 'ArrowLeft') {
-                    showPrevPage();
-                    document.getElementById('prev-btn').focus();
+                    // Focus ቁጥሩ ላይ ካልሆነ ገጽ ይቀይራል
+                    if (document.activeElement !== pageInput) {
+                        showPrevPage();
+                        document.getElementById('prev-btn').focus();
+                    }
                 } else if (e.key === 'ArrowRight') {
-                    showNextPage();
-                    document.getElementById('next-btn').focus();
+                    if (document.activeElement !== pageInput) {
+                        showNextPage();
+                        document.getElementById('next-btn').focus();
+                    }
                 } else if (e.key === 'ArrowUp') {
-                    // የላይኛው ቀስት ጽሑፉን ወደላይ ብቻ ያንሸራትታል
-                    container.scrollTop -= 60; 
+                    container.scrollTop -= 70; 
                     e.preventDefault();
                 } else if (e.key === 'ArrowDown') {
-                    // የታችኛው ቀስት ጽሑፉን ወደታች ብቻ ያንሸራትታል
-                    container.scrollTop += 60;
+                    container.scrollTop += 70;
                     e.preventDefault();
                 }
             }
@@ -383,7 +462,7 @@
         
         document.getElementById('back-to-menu-btn').addEventListener('click', () => {
             pageNum = 1;
-            scale = 1.3;
+            scale = 1.4;
             document.getElementById('main-viewer').style.display = 'none';
             document.getElementById('file-selector-container').style.display = 'flex';
             document.getElementById('browse-btn').focus();
